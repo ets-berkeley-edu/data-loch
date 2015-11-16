@@ -1,4 +1,7 @@
 {
+  "canvas": {
+    "apiKey": "xyz"
+  },
   "redshift": {
     "apiKey": "xyz",
     "apiSecret": "xyz",

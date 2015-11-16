@@ -48,8 +48,8 @@ var processLogins = function(callback) {
   RedshiftData.getRequests('subset', function(requests) {
     processStatements('Logins', requests, xapicaliper.session.login, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return request.url.indexOf('/login/') === 0;
+      'filter': function(request, callback) {
+        return callback(request.url.indexOf('/login/') === 0);
       },
       'metadata': function(request, course, callback) {
         return callback({
@@ -71,8 +71,8 @@ var processCourseNavigation = function(callback) {
     var courseRegEx = new RegExp('^\/courses\/[0-9]+$');
     processStatements('Course navigation', requests, xapicaliper.session.navigateToCourse, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return courseRegEx.test(request.url);
+      'filter': function(request, callback) {
+        return callback(courseRegEx.test(request.url));
       },
       'metadata': function(request, course, callback) {
         return callback({
@@ -94,8 +94,8 @@ var processLogouts = function(callback) {
   RedshiftData.getRequests('subset', function(requests) {
     processStatements('Logouts', requests, xapicaliper.session.logout, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return request.url.indexOf('/logout') === 0;
+      'filter': function(request, callback) {
+        return callback(request.url.indexOf('/logout') === 0);
       }
     }, callback);
   });
@@ -133,8 +133,8 @@ var processDiscussionToolNavigation = function(callback) {
     var discussionRegEx2 = new RegExp('^\/api\/v1\/courses\/[0-9]+\/discussion_topics([?]|\z)');
     processStatements('Discussion tool navigation', requests, xapicaliper.session.navigateToPage, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return (discussionRegEx1.test(request.url) || discussionRegEx2.test(request.url) && request.http_method === 'GET');
+      'filter': function(request, callback) {
+        return callback((discussionRegEx1.test(request.url) || discussionRegEx2.test(request.url)) && request.http_method === 'GET');
       },
       'metadata': function (request, course, callback) {
         return callback({
@@ -179,8 +179,8 @@ var processDiscussionReads = function(callback) {
       var discussionRegEx2 = new RegExp('^\/api\/v1\/courses\/[0-9]+\/discussion_topics\/[0-9]+\/view');
       processStatements('Discussion reads', requests, xapicaliper.discussion.read, {
         'timestamp': 'timestamp',
-        'filter': function(request) {
-          return (discussionRegEx1.test(request.url) || discussionRegEx2.test(request.url) && request.http_method === 'GET');
+        'filter': function(request, callback) {
+          return callback((discussionRegEx1.test(request.url) || discussionRegEx2.test(request.url)) && request.http_method === 'GET');
         },
         'metadata': function (request, course, callback) {
           var discussion = discussions[request.discussion_id];
@@ -256,8 +256,8 @@ var processAssignmentToolNavigation = function(callback) {
     var assignmentRegEx = new RegExp('^\/courses\/[0-9]+\/assignments$');
     processStatements('Assignment tool navigation', requests, xapicaliper.session.navigateToPage, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return assignmentRegEx.test(request.url) && request.http_method === 'GET';
+      'filter': function(request, callback) {
+        return callback(assignmentRegEx.test(request.url) && request.http_method === 'GET');
       },
       'metadata': function (request, course, callback) {
         return callback({
@@ -280,9 +280,9 @@ var processAssignmentCreations = function(callback) {
     processStatements('Create assignment', assignments, xapicaliper.assignment.create, {
       // Note: Add a random assignment creator until
       // that information is available in the data dump
-      'filter': function(assignment) {
+      'filter': function(assignment, callback) {
         assignment.user_id = _.sample(_.keys(users));
-        return true;
+        return callback(true);
       },
       'metadata': function(assignment, course, callback) {
         return callback({
@@ -308,8 +308,8 @@ var processAssignmentViews = function(callback) {
       var assignmentRegEx = new RegExp('^\/courses\/[0-9]+\/assignments\/[0-9]+$');
       processStatements('Assignment views', requests, xapicaliper.assignment.view, {
         'timestamp': 'timestamp',
-        'filter': function(request) {
-          return assignmentRegEx.test(request.url) && request.http_method === 'GET';
+        'filter': function(request, callback) {
+          return callback(assignmentRegEx.test(request.url) && request.http_method === 'GET');
         },
         'metadata': function (request, course, callback) {
           var assignment = assignments[request.assignment_id];
@@ -436,8 +436,8 @@ var processFilesToolNavigation = function(callback) {
     var fileRegEx = new RegExp('^\/courses\/[0-9]+\/files');
     processStatements('Files tool navigation', requests, xapicaliper.session.navigateToPage, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return fileRegEx.test(request.url) && request.http_method === 'GET';
+      'filter': function(request, callback) {
+        return callback(fileRegEx.test(request.url) && request.http_method === 'GET');
       },
       'metadata': function (request, course, callback) {
         return callback({
@@ -460,20 +460,32 @@ var processFileUploads = function(callback) {
     var fileRegEx = new RegExp('^\/files\/s3_success\/[0-9]+');
     processStatements('File uploads', requests, xapicaliper.file.upload, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return fileRegEx.test(request.url) && request.http_method === 'GET';
+      'filter': function(request, callback) {
+        var match = (fileRegEx.test(request.url) && request.http_method === 'GET');
+        if (!match) {
+          return callback(false);
+        }
+
+        // Get the file information from the Canvas REST API and enhance the row
+        // with the file information
+        var file_id = request.url.split('?')[0].split('/')[3];
+        RedshiftData.getFile(file_id, function(err, file, course_id) {
+          request.file = file;
+          request.course_id = course_id;
+          return callback(match);
+        });
       },
       'metadata': function (request, course, callback) {
-        var file_id = request.url.split('?')[0].split('/')[3];
-        RedshiftData.getFile(file_id, function(file) {
-          // Note: Add course identifier once course is available in metadata
-          return callback({
-            'id': generateCanvasAPIURL('/files/' + file.id),
-            'title': file.display_name,
-            'url': file.url,
-            'size': file.size,
-            'mime_type': file['content-type']
-          });
+        var id = 'files/' + request.file.id;
+        if (request.course_id) {
+          id = 'courses/' + request.course_id + + '/' + id;
+        }
+        return callback({
+          'id': generateCanvasAPIURL(id),
+          'title': request.file.display_name,
+          'url': request.file.url,
+          'size': request.file.size,
+          'mime_type': request.file['content-type']
         });
       }
     }, callback);
@@ -492,8 +504,8 @@ var processFilePreviews = function(callback) {
     var fileRegEx2 = new RegExp('^\/courses\/[0-9]+\/files\/[0-9]+/inline_view');
     processStatements('File previews', requests, xapicaliper.file.preview, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return (fileRegEx1.test(request.url) || fileRegEx2.test(request.url)) && request.http_method === 'GET';
+      'filter': function(request, callback) {
+        return callback((fileRegEx1.test(request.url) || fileRegEx2.test(request.url)) && request.http_method === 'GET');
       },
       'metadata': function (request, course, callback) {
         var file_id = request.url.split('?')[0].split('/')[4];
@@ -516,8 +528,8 @@ var processFileDownloads = function(callback) {
     var fileRegEx = new RegExp('^\/courses\/[0-9]+\/files\/[0-9]+/download');
     processStatements('File downloads', requests, xapicaliper.file.download, {
       'timestamp': 'timestamp',
-      'filter': function(request) {
-        return fileRegEx.test(request.url) && request.http_method === 'GET';
+      'filter': function(request, callback) {
+        return callback(fileRegEx.test(request.url) && request.http_method === 'GET');
       },
       'metadata': function (request, course, callback) {
         var file_id = request.url.split('?')[0].split('/')[4];
@@ -542,6 +554,7 @@ var processFileDownloads = function(callback) {
  * @param  {String}             [opts.user]               The name of the field in the row that represents the user that performed the activity. Defaults to `user_id`
  * @param  {Function}           [opts.filter]             Function that determines whether a learning activity should be created for a row
  * @param  {Object}             [opts.filter.row]         The row for which the filter function determines whether a learning activity should be created
+ * @param  {Function}           [opts.filter.callback]    Callback function to call when the filter has been applied
  * @param  {Function}           [opts.metadata]           Function that will return the metadata for the learning activity as required by the xAPI/Caliper utility
  * @param  {Object}             [opts.metadata.row]       The row for which to generate the metadata
  * @param  {Object}             [opts.metadata.course]    The course that corresponds to the row, if any
@@ -562,53 +575,57 @@ var processStatements = function(type, data, statementGenerator, opts, callback)
   opts.timestamp = opts.timestamp || 'created_at';
   // Default user field
   opts.user = opts.user || 'user_id';
+  // Default filter
+  opts.filter = opts.filter || function(row, callback) { return callback(true); };
   // Default metadata generator
   opts.metadata = opts.metadata || function(row, course, callback) { return callback(null); };
 
-  async.eachSeries(data, function(row, done) {
-    // When a row filter has been verified, check if the row
-    // should be processed
-    if (opts.filter && !opts.filter(row)) {
-      return done();
-    }
 
-    var user = users[row[opts.user]];
-    if (user && user.sis_user_id) {
-      // Get the course in which the activity took place
-      var course = null;
-      // The context object that will be passed into the statement generator
-      var context = null;
-      if (row.course_id && courses[row.course_id]) {
-        course = courses[row.course_id];
-        context = {
-          'id': generateCanvasAPIURL('courses/' + course.canvas_id),
-          'name': course.name
-        };
+  async.eachSeries(data, function(row, done) {
+    // Check if the row should be processed
+    opts.filter(row, function(match) {
+      if (!match) {
+        return done();
       }
-      // Get the metadata object
-      opts.metadata(row, course, function(metadata) {
-        // Generate the statement and store it in a Learning Record Store
-        statementGenerator(CONFIG, {
-          'timestamp': row[opts.timestamp],
-          'actor': getActor(user),
-          'metadata': metadata,
-          'context': context
-        }, function(err, statement) {
-          if (err) {
-            failed++;
-            log.error({'err': err, 'statement': statement}, 'Failed to process statement');
-          } else {
-            processed++;
-            log.info({'statement': statement}, 'Successfully processed statement');
-          }
-          return callback();
-          // TODO: return done();
+
+      var user = users[row[opts.user]];
+      if (user && user.sis_user_id) {
+        // Get the course in which the activity took place
+        var course = null;
+        // The context object that will be passed into the statement generator
+        var context = null;
+        if (row.course_id && courses[row.course_id]) {
+          course = courses[row.course_id];
+          context = {
+            'id': generateCanvasAPIURL('courses/' + course.canvas_id),
+            'name': course.name
+          };
+        }
+        // Get the metadata object
+        opts.metadata(row, course, function(metadata) {
+          // Generate the statement and store it in a Learning Record Store
+          statementGenerator(CONFIG, {
+            'timestamp': row[opts.timestamp],
+            'actor': getActor(user),
+            'metadata': metadata,
+            'context': context
+          }, function(err, statement) {
+            if (err) {
+              failed++;
+              log.error({'err': err, 'statement': statement}, 'Failed to process statement');
+            } else {
+              processed++;
+              log.info({'statement': statement}, 'Successfully processed statement');
+            }
+            return callback();
+            // TODO: return done();
+          });
         });
-      });
-    } else {
-      skipped++;
-      return done();
-    }
+      } else {
+        skipped++;
+        return done();
+      }
+    });
   }, function() {
     log.info({'type': type, 'processed': processed, 'skipped': skipped, 'failed': failed}, 'Finished processing statements');
     return callback();
