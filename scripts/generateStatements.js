@@ -51,10 +51,10 @@ var processLogins = function(callback) {
       'filter': function(request) {
         return request.url.indexOf('/login/') === 0;
       },
-      'metadata': function(request, course) {
-        return {
+      'metadata': function(request, course, callback) {
+        return callback({
           'id': request.id
-        }
+        });
       }
     }, callback);
   });
@@ -74,11 +74,11 @@ var processCourseNavigation = function(callback) {
       'filter': function(request) {
         return courseRegEx.test(request.url);
       },
-      'metadata': function(request, course) {
-        return {
+      'metadata': function(request, course, callback) {
+        return callback({
           'id': generateCanvasAPIURL('courses/' + course.canvas_id),
           'name': course.name
-        }
+        });
       }
     }, callback);
   });
@@ -133,14 +133,14 @@ var processDiscussionToolNavigation = function(callback) {
     var discussionRegEx2 = new RegExp('^\/api\/v1\/courses\/[0-9]+\/discussion_topics([?]|\z)');
     processStatements('Discussion tool navigation', requests, xapicaliper.session.navigateToPage, {
       'timestamp': 'timestamp',
-      'filter': function (request) {
+      'filter': function(request) {
         return (discussionRegEx1.test(request.url) || discussionRegEx2.test(request.url) && request.http_method === 'GET');
       },
-      'metadata': function (request, course) {
-        return {
+      'metadata': function (request, course, callback) {
+        return callback({
           'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/discussion_topics'),
           'name': 'Discussion Tool'
-        }
+        });
       }
     }, callback);
   });
@@ -155,12 +155,12 @@ var processDiscussionToolNavigation = function(callback) {
 var processDiscussionCreations = function(callback) {
   RedshiftData.getDiscussions('subset', function(discussions) {
     processStatements('Create discussion', discussions, xapicaliper.discussion.start, {
-      'metadata': function(discussion, course) {
-        return {
+      'metadata': function(discussion, course, callback) {
+        return callback({
           'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/discussion_topics/' + discussion.canvas_id),
           'title': discussion.title,
           'body': discussion.message
-        };
+        });
       }
     }, callback);
   });
@@ -179,14 +179,14 @@ var processDiscussionReads = function(callback) {
       var discussionRegEx2 = new RegExp('^\/api\/v1\/courses\/[0-9]+\/discussion_topics\/[0-9]+\/view');
       processStatements('Discussion reads', requests, xapicaliper.discussion.read, {
         'timestamp': 'timestamp',
-        'filter': function (request) {
+        'filter': function(request) {
           return (discussionRegEx1.test(request.url) || discussionRegEx2.test(request.url) && request.http_method === 'GET');
         },
-        'metadata': function (request, course) {
+        'metadata': function (request, course, callback) {
           var discussion = discussions[request.discussion_id];
-          return {
+          return callback({
             'discussion': generateCanvasAPIURL('courses/' + course.canvas_id + '/discussion_topics/' + discussion.canvas_id)
-          }
+          });
         }
       }, callback);
     });
@@ -203,7 +203,7 @@ var processDiscussionPosts = function(callback) {
   RedshiftData.getDiscussions('subset', function(discussions) {
     RedshiftData.getDiscussionEntries('subset', function(entries) {
       processStatements('Discussion posts', entries, xapicaliper.discussion.post, {
-        'metadata': function(entry, course) {
+        'metadata': function(entry, course, callback) {
           var discussion = discussions[entry.topic_id];
           var metadataObj = {
             'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/discussion_topics/' + discussion.canvas_id + '/entries/' + entry.canvas_id),
@@ -214,7 +214,7 @@ var processDiscussionPosts = function(callback) {
             var parent = entries[entry.parent_discussion_entry_id];
             metadataObj.parent = generateCanvasAPIURL('courses/' + course.canvas_id + '/discussion_topics/' + discussion.canvas_id + '/entries/' + parent.canvas_id);
           }
-          return metadataObj;
+          return callback(metadataObj);
         }
       }, callback);
     });
@@ -256,14 +256,14 @@ var processAssignmentToolNavigation = function(callback) {
     var assignmentRegEx = new RegExp('^\/courses\/[0-9]+\/assignments$');
     processStatements('Assignment tool navigation', requests, xapicaliper.session.navigateToPage, {
       'timestamp': 'timestamp',
-      'filter': function (request) {
+      'filter': function(request) {
         return assignmentRegEx.test(request.url) && request.http_method === 'GET';
       },
-      'metadata': function (request, course) {
-        return {
+      'metadata': function (request, course, callback) {
+        return callback({
           'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/assignments'),
           'name': 'Assignment Tool'
-        }
+        });
       }
     }, callback);
   });
@@ -284,13 +284,13 @@ var processAssignmentCreations = function(callback) {
         assignment.user_id = _.sample(_.keys(users));
         return true;
       },
-      'metadata': function(assignment, course) {
-        return {
+      'metadata': function(assignment, course, callback) {
+        return callback({
           'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id),
           'title': assignment.title,
           'description': assignment.description,
           'submission_types': assignment.submission_types.split(',')
-        };
+        });
       }
     }, callback);
   });
@@ -308,14 +308,14 @@ var processAssignmentViews = function(callback) {
       var assignmentRegEx = new RegExp('^\/courses\/[0-9]+\/assignments\/[0-9]+$');
       processStatements('Assignment views', requests, xapicaliper.assignment.view, {
         'timestamp': 'timestamp',
-        'filter': function (request) {
+        'filter': function(request) {
           return assignmentRegEx.test(request.url) && request.http_method === 'GET';
         },
-        'metadata': function (request, course) {
+        'metadata': function (request, course, callback) {
           var assignment = assignments[request.assignment_id];
-          return {
+          return callback({
             'assignment': generateCanvasAPIURL('courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id)
-          }
+          });
         }
       }, callback);
     });
@@ -332,13 +332,13 @@ var processAssignmentSubmissions = function(callback) {
   RedshiftData.getAssignments('subset', function(assignments) {
     RedshiftData.getAssignmentSubmissions('subset', function(assignmentSubmissions) {
       processStatements('Submit assignment', assignmentSubmissions, xapicaliper.assignment.submit, {
-        'metadata': function (assignmentSubmission, course) {
+        'metadata': function (assignmentSubmission, course, callback) {
           var assignment = assignments[assignmentSubmission.assignment_id];
-          return {
+          return callback({
             'id': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id + '/submissions/' + assignmentSubmission.canvas_id),
             'assignment': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id),
             'submission': (assignmentSubmission.body || assignmentSubmission.url)
-          };
+          });
         }
       }, callback);
     });
@@ -356,7 +356,7 @@ var processAssignmentGrading = function(callback) {
     RedshiftData.getAssignmentSubmissions('subset', function(assignmentSubmissions) {
       processStatements('Assignment grading', assignmentSubmissions, xapicaliper.assignment.receive_grade, {
         'timestamp': 'graded_at',
-        'metadata': function (assignmentSubmission, course) {
+        'metadata': function (assignmentSubmission, course, callback) {
           var assignment = assignments[assignmentSubmission.assignment_id];
           var grader = null;
           if (assignmentSubmission.grader_id) {
@@ -366,12 +366,12 @@ var processAssignmentGrading = function(callback) {
           if (grade) {
             grade = parseFloat(grade);
           }
-          return {
+          return callback({
             'id': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id + '/submissions/' + assignmentSubmission.canvas_id),
             'assignment': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id),
             'grade': grade,
             'grader': grader
-          };
+          });
         }
       }, callback);
     });
@@ -390,18 +390,142 @@ var processAssignmentFeedback = function(callback) {
       RedshiftData.getAssignmentSubmissionComments('subset', function (assignmentSubmissionComments) {
         processStatements('Assignment feedback', assignmentSubmissionComments, xapicaliper.assignment.feedback, {
           'user': 'commenter_user_id',
-          'metadata': function (assignmentSubmissionComment, course) {
+          'metadata': function (assignmentSubmissionComment, course, callback) {
             var assignment = assignments[assignmentSubmissionComment.assignment_id];
             var assignmentSubmission = assignmentSubmissions[assignmentSubmissionComment.submission_id];
-            return {
+            return callback({
               'id': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id + '/submissions/' + assignmentSubmission.canvas_id + '/feedback/' + assignmentSubmissionComment.canvas_id),
               'submission': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id + '/submissions/' + assignmentSubmission.canvas_id),
               'feedback': assignmentSubmissionComment.comment
-            };
+            });
           }
         }, callback);
       });
     });
+  });
+};
+
+/* FILES */
+
+/**
+ * Process all files related learning activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processFiles = function(callback) {
+  processFilesToolNavigation(function() {
+    processFileUploads(function() {
+      processFilePreviews(function () {
+        processFileDownloads(function () {
+          return callback();
+        });
+      });
+    });
+  });
+};
+
+/**
+ * Process all assignment tool navigation activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processFilesToolNavigation = function(callback) {
+  RedshiftData.getRequests('subset', function (requests) {
+    var fileRegEx = new RegExp('^\/courses\/[0-9]+\/files');
+    processStatements('Files tool navigation', requests, xapicaliper.session.navigateToPage, {
+      'timestamp': 'timestamp',
+      'filter': function(request) {
+        return fileRegEx.test(request.url) && request.http_method === 'GET';
+      },
+      'metadata': function (request, course, callback) {
+        return callback({
+          'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/files'),
+          'name': 'Files Tool'
+        });
+      }
+    }, callback);
+  });
+};
+
+/**
+ * Process all file upload activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processFileUploads = function(callback) {
+  RedshiftData.getRequests('subset', function (requests) {
+    var fileRegEx = new RegExp('^\/files\/s3_success\/[0-9]+');
+    processStatements('File uploads', requests, xapicaliper.file.upload, {
+      'timestamp': 'timestamp',
+      'filter': function(request) {
+        return fileRegEx.test(request.url) && request.http_method === 'GET';
+      },
+      'metadata': function (request, course, callback) {
+        var file_id = request.url.split('?')[0].split('/')[3];
+        RedshiftData.getFile(file_id, function(file) {
+          // Note: Add course identifier once course is available in metadata
+          return callback({
+            'id': generateCanvasAPIURL('/files/' + file.id),
+            'title': file.display_name,
+            'url': file.url,
+            'size': file.size,
+            'mime_type': file['content-type']
+          });
+        });
+      }
+    }, callback);
+  });
+};
+
+/**
+ * Process all file preview activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processFilePreviews = function(callback) {
+  RedshiftData.getRequests('subset', function (requests) {
+    var fileRegEx1 = new RegExp('^\/courses\/[0-9]+\/files\/[0-9]+/preview');
+    var fileRegEx2 = new RegExp('^\/courses\/[0-9]+\/files\/[0-9]+/inline_view');
+    processStatements('File previews', requests, xapicaliper.file.preview, {
+      'timestamp': 'timestamp',
+      'filter': function(request) {
+        return (fileRegEx1.test(request.url) || fileRegEx2.test(request.url)) && request.http_method === 'GET';
+      },
+      'metadata': function (request, course, callback) {
+        var file_id = request.url.split('?')[0].split('/')[4];
+        return callback({
+          'file': generateCanvasAPIURL('courses/' + course.canvas_id + '/files/' + file_id)
+        });
+      }
+    }, callback);
+  });
+};
+
+/**
+ * Process all file download activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processFileDownloads = function(callback) {
+  RedshiftData.getRequests('subset', function (requests) {
+    var fileRegEx = new RegExp('^\/courses\/[0-9]+\/files\/[0-9]+/download');
+    processStatements('File downloads', requests, xapicaliper.file.download, {
+      'timestamp': 'timestamp',
+      'filter': function(request) {
+        return fileRegEx.test(request.url) && request.http_method === 'GET';
+      },
+      'metadata': function (request, course, callback) {
+        var file_id = request.url.split('?')[0].split('/')[4];
+        return callback({
+          'file': generateCanvasAPIURL('courses/' + course.canvas_id + '/files/' + file_id)
+        });
+      }
+    }, callback);
   });
 };
 
@@ -421,6 +545,7 @@ var processAssignmentFeedback = function(callback) {
  * @param  {Function}           [opts.metadata]           Function that will return the metadata for the learning activity as required by the xAPI/Caliper utility
  * @param  {Object}             [opts.metadata.row]       The row for which to generate the metadata
  * @param  {Object}             [opts.metadata.course]    The course that corresponds to the row, if any
+ * @param  {Function}           [opts.metadata.callback]  Callback function to call when metadata has been assembled
  * @param  {Function}           callback                  Standard callback function
  */
 var processStatements = function(type, data, statementGenerator, opts, callback) {
@@ -438,7 +563,7 @@ var processStatements = function(type, data, statementGenerator, opts, callback)
   // Default user field
   opts.user = opts.user || 'user_id';
   // Default metadata generator
-  opts.metadata = opts.metadata || function() { return null; };
+  opts.metadata = opts.metadata || function(row, course, callback) { return callback(null); };
 
   async.eachSeries(data, function(row, done) {
     // When a row filter has been verified, check if the row
@@ -460,21 +585,25 @@ var processStatements = function(type, data, statementGenerator, opts, callback)
           'name': course.name
         };
       }
-      statementGenerator(CONFIG, {
-        'timestamp': row[opts.timestamp],
-        'actor': getActor(user),
-        'metadata': opts.metadata(row, course),
-        'context': context
-      }, function(err, statement) {
-        if (err) {
-          failed++;
-          log.error({'err': err, 'statement': statement}, 'Failed to process statement');
-        } else {
-          processed++;
-          log.debug({'statement': statement}, 'Successfully processed statement');
-        }
-        return callback();
-        // TODO: return done();
+      // Get the metadata object
+      opts.metadata(row, course, function(metadata) {
+        // Generate the statement and store it in a Learning Record Store
+        statementGenerator(CONFIG, {
+          'timestamp': row[opts.timestamp],
+          'actor': getActor(user),
+          'metadata': metadata,
+          'context': context
+        }, function(err, statement) {
+          if (err) {
+            failed++;
+            log.error({'err': err, 'statement': statement}, 'Failed to process statement');
+          } else {
+            processed++;
+            log.info({'statement': statement}, 'Successfully processed statement');
+          }
+          return callback();
+          // TODO: return done();
+        });
       });
     } else {
       skipped++;
@@ -523,13 +652,13 @@ RedshiftData.getUsers('base', function(_users) {
     processSessions(function () {
       // Process the discussion events
       processDiscussions(function () {
-        // Process the files events
-        // processFiles(function () {
-          // Process the assessment events
-          processAssignments(function () {
+        // Process the assessment events
+        processAssignments(function () {
+          // Process the files events
+          processFiles(function () {
             log.info('Finished processing all Canvas Data activities');
           });
-        // });
+        });
       });
     });
   });
