@@ -1,0 +1,20 @@
+{
+  "redshift": {
+    "apiKey": "xyz",
+    "apiSecret": "xyz",
+    "host": "beta.inshosteddata.com",
+    "https": true
+  },
+  "statements": {
+    "type": "xapi",
+    "platform": {
+      "name": 'bCourses',
+      "url": 'https://bcourses.berkeley.edu'
+    },
+    "lrs": {
+      "endpoint": 'https://foo.bar/statements',
+      "username": 'xyz',
+      "password": 'xyz'
+    }
+  }
+}
