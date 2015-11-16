@@ -8,13 +8,13 @@
   "statements": {
     "type": "xapi",
     "platform": {
-      "name": 'bCourses',
-      "url": 'https://bcourses.berkeley.edu'
+      "name": "bCourses",
+      "url": "https://bcourses.berkeley.edu"
     },
     "lrs": {
-      "endpoint": 'https://foo.bar/statements',
-      "username": 'xyz',
-      "password": 'xyz'
+      "endpoint": "https://foo.bar/statements",
+      "username": "xyz",
+      "password": "xyz"
     }
   }
 }

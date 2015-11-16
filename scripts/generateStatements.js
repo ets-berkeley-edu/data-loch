@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var async = require('async');
+var config = require('config');
 var xapicaliper = require('xapicaliper');
 var argv = require('yargs')
   .usage('Usage: $0 --max-old-space-size=8192')

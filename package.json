@@ -15,6 +15,7 @@
     "glob": "latest",
     "lodash": "latest",
     "request": "latest",
+    "xapicaliper": "git://github.com/nicolaasmatthijs/xapicaliper.git",
     "yargs": "latest"
   },
   "bundleDependencies": [
