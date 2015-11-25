@@ -5,7 +5,7 @@
   "redshift": {
     "apiKey": "xyz",
     "apiSecret": "xyz",
-    "host": "beta.inshosteddata.com",
+    "host": "api.inshosteddata.com",
     "https": true
   },
   "statements": {

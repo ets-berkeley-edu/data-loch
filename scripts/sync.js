@@ -29,7 +29,7 @@ var downloadFiles = function(callback) {
 
     async.eachSeries(tables, function(table, done) {
       // Skip downloading of requests files
-      if (table === 'requests') {
+      if (table !== 'requests') {
         return done();
       }
 
@@ -37,6 +37,7 @@ var downloadFiles = function(callback) {
       log.info({'table': table}, 'Processing table');
       redshiftUtil.canvasDataApiRequest('/file/byTable/' + table, function(tableDump) {
         var full = _.findWhere(tableDump.history, {'partial': false});
+
         if (!full) {
           log.warn({'table': table}, 'Unable to find full dump. Skipping');
           return done();
@@ -53,7 +54,7 @@ var downloadFiles = function(callback) {
         }
 
         // Download the files to disk
-        redshiftUtil.downloadFiles(files, true, function(filenames) {
+        redshiftUtil.downloadFiles(files, function(filenames) {
           log.info({'table': table, 'total': files.length}, 'Finished downloading files');
           return done();
         });

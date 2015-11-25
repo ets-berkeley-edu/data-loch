@@ -20,6 +20,93 @@ var courses = null;
 // xAPI/Caliper utility configuration
 var CONFIG = config.get('statements');
 
+/* COURSE */
+
+/**
+ * Process all course related learning activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processCourses = function(callback) {
+  processCourseCreations(function() {
+    processCourseEnrollments(function() {
+      processCourseUnenrollments(function() {
+        return callback();
+      });
+    });
+  });
+};
+
+/**
+ * Process all course creation activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processCourseCreations = function(callback) {
+  processStatements('Course creations', courses, xapicaliper.course.create, {
+    'metadata': function(course, _course, callback) {
+      return callback({
+        'id': generateCanvasAPIURL('courses/' + course.canvas_id),
+        'name': course.code,
+        'description': course.name,
+        'start': course.start_at,
+        'end': course.conclude_at
+      });
+    }
+  }, callback);
+};
+
+/**
+ * Process all course enrollment activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processCourseEnrollments = function(callback) {
+  RedshiftData.getEnrollments('subset', function(enrollments) {
+    processStatements('Course enrollments', enrollments, xapicaliper.course.enroll, {
+      'filter': function(enrollment, callback) {
+        // Fall back to created date if no start date is available
+        enrollment.created_at = enrollment.start_at || enrollment.created_at;
+        return callback(true);
+      },
+      'metadata': function (enrollment, course, callback) {
+        return callback({
+          'course': generateCanvasAPIURL('courses/' + course.canvas_id)
+        });
+      }
+    }, callback);
+  });
+};
+
+/**
+ * Process all course unenrollment activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processCourseUnenrollments = function(callback) {
+  RedshiftData.getEnrollments('subset', function(enrollments) {
+    processStatements('Course unenrollments', enrollments, xapicaliper.course.leave, {
+      'timestamp': 'end_at',
+      'filter': function(enrollment, callback) {
+        if (enrollment.end_at) {
+          return callback(true);
+        } else {
+          return callback(false);
+        }
+      },
+      'metadata': function (enrollment, course, callback) {
+        return callback({
+          'course': generateCanvasAPIURL('courses/' + course.canvas_id)
+        });
+      }
+    }, callback);
+  });
+};
+
 /* SESSION */
 
 /**
@@ -354,23 +441,18 @@ var processAssignmentSubmissions = function(callback) {
 var processAssignmentGrading = function(callback) {
   RedshiftData.getAssignments('subset', function(assignments) {
     RedshiftData.getAssignmentSubmissions('subset', function(assignmentSubmissions) {
-      processStatements('Assignment grading', assignmentSubmissions, xapicaliper.assignment.receive_grade, {
+      processStatements('Assignment grading', assignmentSubmissions, xapicaliper.assignment.grade, {
         'timestamp': 'graded_at',
+        'user': 'grader_id',
         'metadata': function (assignmentSubmission, course, callback) {
           var assignment = assignments[assignmentSubmission.assignment_id];
-          var grader = null;
-          if (assignmentSubmission.grader_id) {
-            grader = getActor(users[assignmentSubmission.grader_id]);
-          }
           var grade = assignmentSubmission.score || assignmentSubmission.published_score;
           if (grade) {
             grade = parseFloat(grade);
           }
           return callback({
             'id': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id + '/submissions/' + assignmentSubmission.canvas_id),
-            'assignment': generateCanvasAPIURL('/courses/' + course.canvas_id + '/assignments/' + assignment.canvas_id),
-            'grade': grade,
-            'grader': grader
+            'grade': grade
           });
         }
       }, callback);
@@ -541,6 +623,121 @@ var processFileDownloads = function(callback) {
   });
 };
 
+/* SYLLABUS */
+
+/**
+ * Process all syllabus related learning activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processSyllabus = function(callback) {
+  processSyllabusToolNavigation(function() {
+    return callback();
+  });
+};
+
+/**
+ * Process all syllabus tool navigation activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processSyllabusToolNavigation = function(callback) {
+  RedshiftData.getRequests('subset', function (requests) {
+    var syllabusRegEx = new RegExp('^\/courses\/[0-9]+\/assignments/syllabus');
+    processStatements('Syllabus tool navigation', requests, xapicaliper.session.navigateToPage, {
+      'timestamp': 'timestamp',
+      'filter': function(request, callback) {
+        return callback(syllabusRegEx.test(request.url) && request.http_method === 'GET');
+      },
+      'metadata': function (request, course, callback) {
+        return callback({
+          'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/syllabus'),
+          'name': 'Syllabus Tool'
+        });
+      }
+    }, callback);
+  });
+};
+
+/* MODULES */
+
+/**
+ * Process all modules related learning activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processModules = function(callback) {
+  processModulesToolNavigation(function() {
+    return callback();
+  });
+};
+
+/**
+ * Process all modules tool navigation activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processModulesToolNavigation = function(callback) {
+  RedshiftData.getRequests('subset', function (requests) {
+    var moduleRegEx = new RegExp('^\/courses\/[0-9]+\/modules$');
+    processStatements('Modules tool navigation', requests, xapicaliper.session.navigateToPage, {
+      'timestamp': 'timestamp',
+      'filter': function(request, callback) {
+        return callback(moduleRegEx.test(request.url) && request.http_method === 'GET');
+      },
+      'metadata': function (request, course, callback) {
+        return callback({
+          'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/modules'),
+          'name': 'Modules Tool'
+        });
+      }
+    }, callback);
+  });
+};
+
+/* PAGES */
+
+/**
+ * Process all pages related learning activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processPages = function(callback) {
+  processPagesViews(function() {
+    return callback();
+  });
+};
+
+/**
+ * Process all pages view activities
+ *
+ * @param  {Function}           callback                  Standard callback function
+ * @api private
+ */
+var processPagesViews = function(callback) {
+  RedshiftData.getRequests('subset', function (requests) {
+    var pageRegEx = new RegExp('^\/api/v1/courses\/[0-9]+\/pages/');
+    processStatements('Pages views', requests, xapicaliper.session.navigateToPage, {
+      'timestamp': 'timestamp',
+      'filter': function(request, callback) {
+        return callback(pageRegEx.test(request.url) && request.http_method === 'GET');
+      },
+      'metadata': function (request, course, callback) {
+        var page = request.url.split('/')[6];
+        return callback({
+          'id': generateCanvasAPIURL('courses/' + course.canvas_id + '/pages/' + page),
+          'name': page
+        });
+      }
+    }, callback);
+  });
+};
+
 /* UTIL */
 
 /**
@@ -665,15 +862,27 @@ RedshiftData.getUsers('base', function(_users) {
   users = _users;
   RedshiftData.getCourses('base', function(_courses) {
     courses = _courses;
-    // Process the session events
-    processSessions(function () {
-      // Process the discussion events
-      processDiscussions(function () {
-        // Process the assessment events
-        processAssignments(function () {
-          // Process the files events
-          processFiles(function () {
-            log.info('Finished processing all Canvas Data activities');
+    // Process the course events
+    processCourses(function() {
+      // Process the session events
+      processSessions(function () {
+        // Process the discussion events
+        processDiscussions(function () {
+          // Process the assessment events
+          processAssignments(function () {
+            // Process the files events
+            processFiles(function () {
+              // Process the syllabus events
+              processSyllabus(function() {
+                // Process the modules events
+                processModules(function() {
+                  // Process the pages events
+                  processPages(function() {
+                    log.info('Finished processing all Canvas Data activities');
+                  });
+                });
+              });
+            });
           });
         });
       });
