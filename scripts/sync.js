@@ -1,11 +1,13 @@
 var _ = require('lodash');
 var async = require('async');
+var config = require('config');
 var csv = require('fast-csv');
 var fs = require('fs');
 var glob = require('glob');
 
 var log = require('../lib/logger');
 var redshiftUtil = require('../lib/util');
+var schema = require('../lib/schema');
 
 var argv = require('yargs')
   .usage('Usage: $0 --max-old-space-size=8192')
@@ -28,11 +30,6 @@ var downloadFiles = function(callback) {
     var tables = _.keys(latestDump.artifactsByTable);
 
     async.eachSeries(tables, function(table, done) {
-      // Skip downloading of requests files
-      if (table !== 'requests') {
-        return done();
-      }
-
       // Get the list of dumps for each table
       log.info({'table': table}, 'Processing table');
       redshiftUtil.canvasDataApiRequest('/file/byTable/' + table, function(tableDump) {
@@ -54,7 +51,7 @@ var downloadFiles = function(callback) {
         }
 
         // Download the files to disk
-        redshiftUtil.downloadFiles(files, function(filenames) {
+        redshiftUtil.downloadFiles('raw', files, function(filenames) {
           log.info({'table': table, 'total': files.length}, 'Finished downloading files');
           return done();
         });
@@ -66,4 +63,42 @@ var downloadFiles = function(callback) {
   });
 };
 
-downloadFiles(function() {});
+/**
+ * Merge Canvas data fact and dimension tables into consolidated files for easier
+ * processing per the configuration in `schema.js`
+ *
+ * @param  {Function}             callback              Standard callback function
+ * @api private
+ */
+var mergeFiles = function(callback) {
+  var storageDirectory = config.get('storage') || './data/';
+
+  // TODO: Copy the request files
+
+  async.forEachOfSeries(schema, function(map, name, done) {
+    // Don't merge the request files as they'll be copied as they are
+    if (name === 'requests') {
+      return done();
+    }
+
+    redshiftUtil.mergeCSVFiles('raw', map, function(rows) {
+
+      // Write the merged rows to a consolidated CSV file
+      var csvStream = csv.format({'delimiter': '\t', 'quote': null});
+      var writableStream = fs.createWriteStream(storageDirectory + 'merged/' + name);
+      writableStream.on('finish', function() {
+        return done();
+      });
+
+      csvStream.pipe(writableStream);
+      _.each(rows, function(row) {
+        csvStream.write(row);
+      });
+      csvStream.end();
+    });
+  });
+};
+
+downloadFiles(function() {
+  mergeFiles(function() {});
+});

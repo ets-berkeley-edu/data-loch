@@ -9,7 +9,7 @@
     "https": true
   },
   "statements": {
-    "type": "xapi",
+    "type": "caliper",
     "platform": {
       "name": "bCourses",
       "url": "https://bcourses.berkeley.edu"

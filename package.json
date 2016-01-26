@@ -14,12 +14,10 @@
     "fast-csv": "latest",
     "glob": "latest",
     "lodash": "latest",
+    "moment": "latest",
     "request": "latest",
-    "xapicaliper": "git://github.com/nicolaasmatthijs/xapicaliper.git",
     "yargs": "latest"
   },
-  "bundleDependencies": [
-  ],
   "engines": {
     "node": ">=0.10"
   }
