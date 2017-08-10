@@ -397,7 +397,7 @@ var generateSubsetWikis = function(subpopulation_users, subpopulation_courses, s
 var generateSubsetRequests = function(subpopulation_users, subpopulation_courses, subpopulation_terms, callback) {
   // Get the full list of request data files
   redshiftUtil.canvasDataApiRequest('/file/byTable/requests', function(tableDump) {
-    var full = _.findWhere(tableDump.history, {'partial': false});
+    var full = _.find(tableDump.history, {'partial': false});
     if (!full) {
       log.warn('Unable to find full dump for requests table');
       return false;

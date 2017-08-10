@@ -33,7 +33,7 @@ var downloadFiles = function(callback) {
       // Get the list of dumps for each table
       log.info({'table': table}, 'Processing table');
       redshiftUtil.canvasDataApiRequest('/file/byTable/' + table, function(tableDump) {
-        var full = _.findWhere(tableDump.history, {'partial': false});
+        var full = _.find(tableDump.history, {'partial': false});
 
         if (!full) {
           log.warn({'table': table}, 'Unable to find full dump. Skipping');
