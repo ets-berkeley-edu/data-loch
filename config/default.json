@@ -1,23 +1,50 @@
 {
+  "aws": {
+    "credentials": {
+      "accessKeyId": "key",
+      "secretAccessKey": "secret",
+      "region": "us-east-1"
+    },
+    "s3": {
+      "bucket": "xyz",
+      "region": "us-east-1",
+      "directory": "xyz/abc"
+    }
+  },
   "canvas": {
-    "apiKey": "xyz"
+    "apiKey": "apiKey"
+  },
+  "dataLake": {
+    "canvasData": {
+      "externalDatabase": "database",
+      "s3Location": "s3://path/to/db",
+      "iamRole": "iam role"
+    },
+    "redshiftSpectrum": {
+      "user": "username",
+      "database": "database",
+      "password": "password",
+      "port": 5439,
+      "host": "redshift cluster"
+    }
+  },
+  "lrs": {
+    "endpoint": "https://localhost/api/statements",
+    "username": "username",
+    "password": "password"
+  },
+  "platform": {
+    "name": "bCourses",
+    "url": "https://bcourses.berkeley.edu"
   },
   "redshift": {
-    "apiKey": "xyz",
-    "apiSecret": "xyz",
+    "apiKey": "instructure apikey",
+    "apiSecret": "instructure secret",
     "host": "api.inshosteddata.com",
     "https": true
   },
   "statements": {
-    "type": "caliper",
-    "platform": {
-      "name": "bCourses",
-      "url": "https://bcourses.berkeley.edu"
-    },
-    "lrs": {
-      "endpoint": "https://foo.bar/statements",
-      "username": "xyz",
-      "password": "xyz"
-    }
-  }
+    "type": "caliper"
+  },
+  "storage": "/path/to/local/store"
 }

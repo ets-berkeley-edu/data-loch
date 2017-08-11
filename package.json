@@ -1,24 +1,30 @@
 {
-  "name": "redshift",
+  "name": "canvas-data-processor",
   "description": "Instructure Canvas Redshift Processor",
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ets-berkeley-edu/redshift.git"
+    "url": "git://github.com/ets-berkeley-edu/canvas-data-processor.git"
   },
   "dependencies": {
-    "async": "latest",
-    "bunyan": "latest",
-    "config": "latest",
-    "content-disposition": "latest",
-    "fast-csv": "latest",
-    "glob": "latest",
-    "lodash": "latest",
-    "moment": "latest",
-    "request": "latest",
-    "yargs": "latest"
+    "async": "2.5.0",
+    "aws-sdk": "2.95.0",
+    "bunyan": "1.8.12",
+    "config": "1.26.1",
+    "content-disposition": "0.5.2",
+    "eslint": "3.19.0",
+    "fast-csv": "2.4.0",
+    "glob": "7.1.2",
+    "gulp": "3.9.1",
+    "gulp-eslint": "3.0.1",
+    "lodash": "4.17.4",
+    "moment": "2.18.1",
+    "node-redshift": "0.1.5",
+    "request": "2.81.0",
+    "xapicaliper":"0.3.0",
+    "yargs": "8.0.2"
   },
   "engines": {
-    "node": ">=0.10"
+    "node": "6.10"
   }
 }
