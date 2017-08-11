@@ -32,3 +32,6 @@ node_modules
 # Configuration files
 config/*.json
 !config/default.json
+
+# SQL Template files
+lib/store/db-templates/*.sql

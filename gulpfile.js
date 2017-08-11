@@ -22,9 +22,25 @@
  * "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
- 
-var bunyan = require('bunyan');
 
-var log = module.exports = bunyan.createLogger({
-  'name': 'Canvas Data'
+var fs = require('fs');
+var gulp = require('gulp');
+var eslint = require('gulp-eslint');
+
+/**
+ * Run the ESLint code style linter
+ */
+gulp.task('eslint', function() {
+  return gulp
+    .src([
+      'gulpfile.js',
+      'lib/*.js',
+      'lib/store/*.js',
+      'scripts/*.js'])
+    .pipe(eslint())
+    // Output results to console. Alternatively, use eslint.formatEach().
+    .pipe(eslint.format())
+    // To have the process exit with an error code (1) on
+    // lint error, return the stream and pipe to failAfterError last.
+    .pipe(eslint.failAfterError());
 });
