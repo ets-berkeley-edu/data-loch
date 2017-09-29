@@ -23,17 +23,8 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-var _ = require('lodash');
 var async = require('async');
-var config = require('config');
-var crypto = require('crypto');
-var csv = require('fast-csv');
-var fs = require('fs');
-var glob = require('glob');
-var util = require('util');
-var moment = require('moment');
 var request = require('request');
-var url = require('url');
 
 var log = require('../lib/logger');
 var redshiftUtil = require('../lib/util');
@@ -62,11 +53,11 @@ var uploadFilesToS3 = module.exports.uploadFilesToS3 = function(files, callback)
     var filename = file.filename;
     filenames.push(filename);
     var table = file.table;
-    log.info({'file': filename}, 'Starting Canvas data file download');
+    log.info({file: filename}, 'Starting Canvas data file download');
 
     // TODO: Requests table has about 2000 partitions of 500 MB each. Load it separately.
     if (table === 'requests') {
-      log.info({'file': filename}, 'Skipping requests upload');
+      log.info({file: filename}, 'Skipping requests upload');
       return done();
     }
 
@@ -78,17 +69,17 @@ var uploadFilesToS3 = module.exports.uploadFilesToS3 = function(files, callback)
     // Access Canvas Data apis and get the relevant files
     request(options, function(err, response, body) {
       if (err || response.statusCode !== 200) {
-        log.error({'err': err}, 'Failed to get the data dump file');
+        log.error({err: err}, 'Failed to get the data dump file');
         return done(err);
 
       } else {
         // organize and store canvas data files in the data lake on S3 buckets
         storage.storeExtractsOnS3(body, filename, table, function(err) {
           if (err) {
-            log.error({'err': err, 'file': filename}, 'Error uploading data dump to s3');
+            log.error({err: err, file: filename}, 'Error uploading data dump to s3');
             return done(err);
           } else {
-            log.info({'file': filename}, 'Success uploading data dump to s3');
+            log.info({file: filename}, 'Success uploading data dump to s3');
             return done();
           }
 
@@ -145,7 +136,7 @@ downloadFiles(function(err) {
 
     redshiftSetUp.createCanvasDb(function(err) {
       if (err) {
-        log.error({'err': err}, 'Canvas Data restore on Redshift instance failed');
+        log.error({err: err}, 'Canvas Data restore on Redshift instance failed');
         process.exit(1);
       }
 

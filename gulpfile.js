@@ -23,24 +23,31 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-var fs = require('fs');
 var gulp = require('gulp');
 var eslint = require('gulp-eslint');
+var runSequence = require('run-sequence');
 
 /**
- * Run the ESLint code style linter
+ * Lint javascript files
  */
 gulp.task('eslint', function() {
   return gulp
-    .src([
-      'gulpfile.js',
-      'lib/*.js',
-      'lib/store/*.js',
-      'scripts/*.js'])
+    .src(['gulpfile.js', 'lib/**/*.js', 'scripts/*.js'])
     .pipe(eslint())
     // Output results to console. Alternatively, use eslint.formatEach().
     .pipe(eslint.format())
     // To have the process exit with an error code (1) on
     // lint error, return the stream and pipe to failAfterError last.
     .pipe(eslint.failAfterError());
+});
+
+/**
+ * Tests and linters run by Travis
+ */
+gulp.task('travis', function() {
+  // Set the environment
+  process.env.NODE_ENV = 'travis';
+
+  // TODO: tests?
+  runSequence('eslint');
 });

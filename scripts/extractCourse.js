@@ -22,7 +22,7 @@
  * "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
- 
+
 var _ = require('lodash');
 var async = require('async');
 var config = require('config');
@@ -31,7 +31,6 @@ var fs = require('fs');
 var glob = require('glob');
 
 var log = require('../lib/logger');
-var redshiftUtil = require('../lib/util');
 var redshiftData = require('../lib/data');
 var schema = require('../lib/schema');
 
@@ -48,7 +47,7 @@ if (!argv.c) {
 
 // Extract the provided course ids and convert them to
 // string to make them match the format of the extracted CSV files
-var course_ids = _.isArray(argv.c) ? argv.c : [argv.c];
+var course_ids = _.isArray(argv.c) ? argv.c : [ argv.c ];
 course_ids = _.map(course_ids, function(course_id) {
   return '' + course_id;
 });
@@ -95,7 +94,7 @@ var extractCourseEnrollments = function(callback) {
  * @param  {Function}       callback                            Standard callback function
  * @api private
  */
- var generateSubsets = function(callback) {
+var generateSubsets = function(callback) {
   // Generate subsets for the users
   generateSubsetUsers(function() {
     // Generate subsets for the courses
@@ -117,7 +116,7 @@ var extractCourseEnrollments = function(callback) {
  * @param  {Function}       callback                            Standard callback function
  * @api private
  */
- var generateSubsetUsers = function(callback) {
+var generateSubsetUsers = function(callback) {
   // Generate a subset of the `users` file
   generateSubset('users', 'id', users, function() {
     // Generate a subset of the `enrollments` file
@@ -133,7 +132,7 @@ var extractCourseEnrollments = function(callback) {
  * @param  {Function}       callback                            Standard callback function
  * @api private
  */
- var generateSubsetCourses = function(callback) {
+var generateSubsetCourses = function(callback) {
   // Generate a subset of the `courses` file
   generateSubset('courses', 'id', courses, function() {
     // Generate a subset of the `course_sections` file
@@ -149,7 +148,7 @@ var extractCourseEnrollments = function(callback) {
  * @param  {Function}       callback                            Standard callback function
  * @api private
  */
- var generateSubsetAssignments = function(callback) {
+var generateSubsetAssignments = function(callback) {
   // Generate a subset of the `assignments` file
   generateSubset('assignments', 'course_id', courses, function() {
     // Generate a subset of the `submissions` files
@@ -168,7 +167,7 @@ var extractCourseEnrollments = function(callback) {
  * @param  {Function}       callback                            Standard callback function
  * @api private
  */
- var generateSubsetDiscussions = function(callback) {
+var generateSubsetDiscussions = function(callback) {
   // Generate a subset of the `discussion_topics` file
   generateSubset('discussion_topics', 'course_id', courses, function() {
     // Generate a subset of the `discussion_entries` file
@@ -188,7 +187,7 @@ var extractCourseEnrollments = function(callback) {
  * @param  {Function}       callback                            Standard callback function
  * @api private
  */
- var generateSubset = function(file, filterField, filter, callback) {
+var generateSubset = function(file, filterField, filter, callback) {
   // When a string value has been provided as the filter value, convert
   // it into a hash filter object to allow for using the same lookup
   // strategy as when filtering on multiple values
@@ -265,13 +264,13 @@ var subset = function(file, rowFilter, callback) {
   var totalRows = 0;
 
   var directory = config.get('storage') || './data/';
-  glob(directory + 'merged/' + file + '*', null, function (err, paths) {
+  glob(directory + 'merged/' + file + '*', null, function(err, paths) {
     async.eachSeries(paths, function(path, done) {
       var start = Date.now();
       log.info('Processing ' + path);
       // Run through all of the rows in the requested data file, filter out the
       // rows and write the results to a new CSV file
-      csv.fromPath(path, {'delimiter': '\t', 'quote': null})
+      csv.fromPath(path, {delimiter: '\t', quote: null})
         .transform(function(row) {
           totalRows++;
           var retain = rowFilter(row);
@@ -282,15 +281,15 @@ var subset = function(file, rowFilter, callback) {
             return null;
           }
         })
-        .pipe(csv.createWriteStream({'delimiter': '\t', 'quote': null}))
-        .pipe(fs.createWriteStream(directory + 'subset/' + file, {'flags': 'a'}))
+        .pipe(csv.createWriteStream({delimiter: '\t', quote: null}))
+        .pipe(fs.createWriteStream(directory + 'subset/' + file, {flags: 'a'}))
         .on('finish', function() {
           var end = Date.now();
-          log.info({'duration': (start - end)}, 'Finished processing ' + path);
+          log.info({duration: start - end}, 'Finished processing ' + path);
           return done();
         });
     }, function() {
-      log.info({'file': file, 'total': totalRows, 'retained': retainedRows}, 'Finished generating a subset for a file');
+      log.info({file: file, total: totalRows, retained: retainedRows}, 'Finished generating a subset for a file');
       return callback();
     });
   });
@@ -299,9 +298,9 @@ var subset = function(file, rowFilter, callback) {
 extractCourses(function() {
   extractCourseEnrollments(function() {
     generateSubsets(function() {
-//      generateSubsetRequests(function() {
-        log.info('DONE!');
-//      });
+      // generateSubsetRequests(function() {
+      log.info('DONE!');
+      // });
     });
   });
 });

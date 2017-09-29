@@ -33,15 +33,13 @@ var argv = require('yargs')
   .alias('h', 'help')
   .argv;
 
-var log = require('../lib/logger');
 var redshiftStatements = require('../lib/statements');
 
 // Variable that will keep track of the write streams for every day file
-var writeStreams = {}
+var writeStreams = {};
 
 redshiftStatements.init(config.get('statements'), 'merged', function(statement) {
   // Open a write stream for the day of the statement
-  var statementDate = new Date();
   var day = moment(statement.timestamp).utc().format('YYYYMMDD');
   if (!writeStreams[day]) {
     var directory = config.get('storage') || './data/';
