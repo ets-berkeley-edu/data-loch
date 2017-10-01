@@ -44,7 +44,7 @@ if (!argv.c) {
 
 // Extract the provided course ids and convert them to
 // string to make them match the format of the extracted CSV files
-var course_ids = _.isArray(argv.c) ? argv.c : [argv.c];
+var course_ids = _.isArray(argv.c) ? argv.c : [ argv.c ];
 course_ids = _.map(course_ids, function(course_id) {
   return '' + course_id;
 });
@@ -64,8 +64,8 @@ var getCourses = function(callback) {
   redshiftData.getCourses('subset', function(course, done) {
     if (_.contains(course_ids, course.canvas_id)) {
       courses['https://bcourses.berkeley.edu/api/v1/courses/' + course.canvas_id] = {
-        'course': course,
-        'enrollments': {}
+        course: course,
+        enrollments: {}
       };
     }
     return done();
@@ -115,7 +115,7 @@ var generateStatements = function(callback) {
 
     // Get the last event for every supplied course
     _.each(statements, function(statement) {
-      var course = courses[ _.get(statement, 'context.contextActivities.grouping.id')];
+      var course = courses[_.get(statement, 'context.contextActivities.grouping.id')];
       if (course && statement.verb.id !== 'http://adlnet.gov/expapi/verbs/registered') {
         course.course.last_activity = moment(statement.timestamp).utc();
       }
@@ -164,6 +164,6 @@ getCourses(function() {
   getCourseEnrollments(function() {
     generateStatements(function() {
       log.info('Done !');
-    })
+    });
   });
-})
+});

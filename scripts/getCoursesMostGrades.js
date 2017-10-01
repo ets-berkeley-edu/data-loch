@@ -47,7 +47,9 @@ RedshiftData.getCourses('merged', function(courses) {
 
       // TODO
       var assignment = assignments[submission.assignment_id];
-      if (!assignment || (assignment.description && assignment.description.indexOf('clicker') !== -1)) {
+      if (!assignment) {
+        return done();
+      } else if (assignment.description && assignment.description.indexOf('clicker') !== -1) {
         return done();
       }
 
@@ -65,7 +67,7 @@ RedshiftData.getCourses('merged', function(courses) {
       sortable.sort(function(a, b) {return b[1] - a[1];});
       for (var i = 0; i < 20; i++) {
         var course = sortable[i];
-        log.info({'course': courses[course[0]], 'submissions': course[1]});
+        log.info({course: courses[course[0]], submissions: course[1]});
       }
     });
   });

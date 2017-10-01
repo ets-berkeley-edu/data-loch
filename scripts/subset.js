@@ -422,7 +422,7 @@ var generateSubsetWikis = function(subpopulation_users, subpopulation_courses, s
 var generateSubsetRequests = function(subpopulation_users, subpopulation_courses, subpopulation_terms, callback) {
   // Get the full list of request data files
   redshiftUtil.canvasDataApiRequest('/file/byTable/requests', function(tableDump) {
-    var full = _.find(tableDump.history, {'partial': false});
+    var full = _.find(tableDump.history, {partial: false});
     if (!full) {
       log.warn('Unable to find full dump for requests table');
       return false;
@@ -441,26 +441,26 @@ var generateSubsetRequests = function(subpopulation_users, subpopulation_courses
     async.eachSeries(files, function(file, done) {
       var start = Date.now();
 
-      redshiftUtil.downloadFiles([file], false, function(filenames) {
+      redshiftUtil.downloadFiles([ file ], false, function(filenames) {
         var filename = filenames[0];
         var retainedRows = 0;
-        csv.fromPath('./data/base/' + filename, {'delimiter': '\t', 'quote': null})
-         .transform(function(row) {
-           if (subpopulation_users[row[5]]) {
-             retainedRows++;
-             return row;
-           } else {
-             return null;
-           }
-         })
-         .pipe(csv.createWriteStream({'delimiter': '\t', 'quote': null}))
-         .pipe(fs.createWriteStream('./data/subset/requests', {'flags': 'a'}))
-         .on('finish', function() {
-           var end = Date.now();
-           log.info({'file': filename, 'duration': (end - start), 'retained': retainedRows}, 'Finished generating a subset for requests file');
-           // Delete the downloaded file
-           fs.unlinkSync('./data/base/' + filename);
-           return done();
+        csv.fromPath('./data/base/' + filename, {delimiter: '\t', quote: null})
+          .transform(function(row) {
+            if (subpopulation_users[row[5]]) {
+              retainedRows++;
+              return row;
+            } else {
+              return null;
+            }
+          })
+          .pipe(csv.createWriteStream({delimiter: '\t', quote: null}))
+          .pipe(fs.createWriteStream('./data/subset/requests', {flags: 'a'}))
+          .on('finish', function() {
+            var end = Date.now();
+            log.info({file: filename, duration: end - start, retained: retainedRows}, 'Finished generating a subset for requests file');
+            // Delete the downloaded file
+            fs.unlinkSync('./data/base/' + filename);
+            return done();
           });
       });
     }, function() {
@@ -486,11 +486,11 @@ var generateSubset = function(file, filterIndex, filter, idIndex, callback) {
   redshiftUtil.parseDataFiles('base/' + file, function(data) {
     var retainedRows = 0;
     var retainedData = {};
-    var csvStream = csv.createWriteStream({'delimiter': '\t', 'quote': null});
+    var csvStream = csv.createWriteStream({delimiter: '\t', quote: null});
     var writableStream = fs.createWriteStream('./data/subset/' + file);
 
-    writableStream.on('finish', function(){
-      log.info({'file': file, 'total': data.length, 'retained': retainedRows}, 'Finished generating a subset for a file');
+    writableStream.on('finish', function() {
+      log.info({file: file, total: data.length, retained: retainedRows}, 'Finished generating a subset for a file');
       data = null;
       return callback(retainedData);
     });

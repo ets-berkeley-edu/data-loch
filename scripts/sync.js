@@ -22,13 +22,12 @@
  * "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
- 
+
 var _ = require('lodash');
 var async = require('async');
 var config = require('config');
 var csv = require('fast-csv');
 var fs = require('fs');
-var glob = require('glob');
 
 var log = require('../lib/logger');
 var redshiftUtil = require('../lib/util');
@@ -56,12 +55,12 @@ var downloadFiles = function(callback) {
 
     async.eachSeries(tables, function(table, done) {
       // Get the list of dumps for each table
-      log.info({'table': table}, 'Processing table');
+      log.info({table: table}, 'Processing table');
       redshiftUtil.canvasDataApiRequest('/file/byTable/' + table, function(tableDump) {
-        var full = _.find(tableDump.history, {'partial': false});
+        var full = _.find(tableDump.history, {partial: false});
 
         if (!full) {
-          log.warn({'table': table}, 'Unable to find full dump. Skipping');
+          log.warn({table: table}, 'Unable to find full dump. Skipping');
           return done();
         }
 
@@ -77,7 +76,7 @@ var downloadFiles = function(callback) {
 
         // Download the files to disk
         redshiftUtil.downloadFiles('raw', files, function(filenames) {
-          log.info({'table': table, 'total': files.length}, 'Finished downloading files');
+          log.info({table: table, total: files.length}, 'Finished downloading files');
           return done();
         });
       });
@@ -109,7 +108,7 @@ var mergeFiles = function(callback) {
     redshiftUtil.mergeCSVFiles('raw', map, function(rows) {
 
       // Write the merged rows to a consolidated CSV file
-      var csvStream = csv.format({'delimiter': '\t', 'quote': null});
+      var csvStream = csv.format({delimiter: '\t', quote: null});
       var writableStream = fs.createWriteStream(storageDirectory + 'merged/' + name);
       writableStream.on('finish', function() {
         return done();
@@ -125,5 +124,5 @@ var mergeFiles = function(callback) {
 };
 
 downloadFiles(function() {
-  mergeFiles(function() {});
+  // mergeFiles(function() {});
 });
