@@ -26,11 +26,11 @@
 var async = require('async');
 var request = require('request');
 
-var log = require('../lib/logger');
-var redshiftUtil = require('../lib/util');
-var storage = require('../lib/store/storage.js');
-var sqlTemplates = require('../lib/store/generateRedshiftFiles');
+var log = require('../lib/logger')('syncToS3');
 var redshiftSetUp = require('../lib/store/redshift');
+var redshiftUtil = require('../lib/util');
+var sqlTemplates = require('../lib/store/generateRedshiftFiles');
+var storage = require('../lib/store/storage.js');
 
 var argv = require('yargs')
   .usage('Usage: $0 --max-old-space-size=8192')

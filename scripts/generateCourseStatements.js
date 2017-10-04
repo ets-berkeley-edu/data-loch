@@ -27,16 +27,17 @@ var _ = require('lodash');
 var config = require('config');
 var fs = require('fs');
 var moment = require('moment');
+
+var log = require('../lib/logger')('generateCourseStatements');
+var redshiftData = require('../lib/data');
+var redshiftStatements = require('../lib/statements');
+
 var argv = require('yargs')
   .usage('Usage: $0 --max-old-space-size=8192 -c [course_id]')
   .describe('c', 'The Canvas id of the course to generate the statements for')
   .help('h')
   .alias('h', 'help')
   .argv;
-
-var log = require('../lib/logger');
-var redshiftData = require('../lib/data');
-var redshiftStatements = require('../lib/statements');
 
 if (!argv.c) {
   log.error('A valid course id should be provided');

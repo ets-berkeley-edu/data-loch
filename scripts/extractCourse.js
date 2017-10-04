@@ -30,7 +30,7 @@ var csv = require('fast-csv');
 var fs = require('fs');
 var glob = require('glob');
 
-var log = require('../lib/logger');
+var log = require('../lib/logger')('extractCourse');
 var redshiftData = require('../lib/data');
 var schema = require('../lib/schema');
 

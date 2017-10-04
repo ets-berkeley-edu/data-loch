@@ -25,7 +25,7 @@
 
 var _ = require('lodash');
 
-var log = require('../lib/logger');
+var log = require('../lib/logger')('getCoursesMostGrades');
 var RedshiftData = require('../lib/data');
 
 var argv = require('yargs')
