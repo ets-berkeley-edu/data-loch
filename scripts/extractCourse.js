@@ -219,9 +219,9 @@ var generateSubsetRequests = function(callback) {
       return true;
     } else if (users[row[userIndex]] && row[urlIndex].indexOf('/login/') === 0) {
       return true;
-    } else {
-      return false;
     }
+    return false;
+
   }, callback);
 };
 
@@ -265,6 +265,11 @@ var subset = function(file, rowFilter, callback) {
 
   var directory = config.get('storage') || './data/';
   glob(directory + 'merged/' + file + '*', null, function(err, paths) {
+    if (err) {
+      log.error({err: err}, 'Failed to glob files');
+      return callback(err);
+    }
+
     async.eachSeries(paths, function(path, done) {
       var start = Date.now();
       log.info('Processing ' + path);
@@ -277,9 +282,9 @@ var subset = function(file, rowFilter, callback) {
           if (retain) {
             retainedRows++;
             return row;
-          } else {
-            return null;
           }
+
+          return null;
         })
         .pipe(csv.createWriteStream({delimiter: '\t', quote: null}))
         .pipe(fs.createWriteStream(directory + 'subset/' + file, {flags: 'a'}))

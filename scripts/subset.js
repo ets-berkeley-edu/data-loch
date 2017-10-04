@@ -73,7 +73,6 @@ var extractSubpopulation = function(subpopulation_size, callback) {
       });
     });
 
-    userTree = null;
     return callback(subpopulation_users, subpopulation_courses, subpopulation_terms);
   });
 };
@@ -449,9 +448,9 @@ var generateSubsetRequests = function(subpopulation_users, subpopulation_courses
             if (subpopulation_users[row[5]]) {
               retainedRows++;
               return row;
-            } else {
-              return null;
             }
+
+            return null;
           })
           .pipe(csv.createWriteStream({delimiter: '\t', quote: null}))
           .pipe(fs.createWriteStream('./data/subset/requests', {flags: 'a'}))
@@ -490,8 +489,12 @@ var generateSubset = function(file, filterIndex, filter, idIndex, callback) {
     var writableStream = fs.createWriteStream('./data/subset/' + file);
 
     writableStream.on('finish', function() {
-      log.info({file: file, total: data.length, retained: retainedRows}, 'Finished generating a subset for a file');
-      data = null;
+      log.info({
+        file: file,
+        total: data.length,
+        retained: retainedRows
+      }, 'Finished generating a subset for a file');
+
       return callback(retainedData);
     });
 

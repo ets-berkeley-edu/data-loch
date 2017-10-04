@@ -47,12 +47,11 @@ var argv = require('yargs')
  * @param  {String[]}           callback.filenames      The filenames of the files that have been downloaded
  */
 var uploadFilesToS3 = module.exports.uploadFilesToS3 = function(files, callback) {
-  var filenames = [];
   // asynchronously downlaod all the data files from the url
   async.eachSeries(files, function(file, done) {
     var filename = file.filename;
-    filenames.push(filename);
     var table = file.table;
+
     log.info({file: filename}, 'Starting Canvas data file download');
 
     // TODO: Requests table has about 2000 partitions of 500 MB each. Load it separately.
@@ -60,7 +59,6 @@ var uploadFilesToS3 = module.exports.uploadFilesToS3 = function(files, callback)
       log.info({file: filename}, 'Skipping requests upload');
       return done();
     }
-
     var options = {
       uri: file.url,
       encoding: null
@@ -70,78 +68,103 @@ var uploadFilesToS3 = module.exports.uploadFilesToS3 = function(files, callback)
     request(options, function(err, response, body) {
       if (err || response.statusCode !== 200) {
         log.error({err: err}, 'Failed to get the data dump file');
+
         return done(err);
-
-      } else {
-        // organize and store canvas data files in the data lake on S3 buckets
-        storage.storeExtractsOnS3(body, filename, table, function(err) {
-          if (err) {
-            log.error({err: err, file: filename}, 'Error uploading data dump to s3');
-            return done(err);
-          } else {
-            log.info({file: filename}, 'Success uploading data dump to s3');
-            return done();
-          }
-
-        });
       }
 
+      // organize and store canvas data files in the data lake on S3 buckets
+      storage.storeExtractsOnS3(body, filename, table, function(err) {
+        if (err) {
+          log.error({err: err, file: filename}, 'Error uploading data dump to s3');
+          return done(err);
+        }
+
+        log.info({file: filename}, 'Success uploading data dump to s3');
+        return done();
+      });
     });
+
   }, function(err) {
     if (err) {
       return callback(err);
     }
 
-    return callback(null, filenames);
+    return callback();
   });
 };
 
 /**
- * Download and unzip a set of Canvas Redshift data files
+ * Download and unzip a set of Canvas Redshift data files and then upload to Amazon S3
  *
  * @param  {Function}           callback                Standard callback function
  */
-var downloadFiles = function(callback) {
+var migrateDataToS3 = function(callback) {
   // Get the list of files, tables and signed URLS that contains a complete Canvas data snapshots
   redshiftUtil.canvasDataApiRequest('/file/sync', function(fileDump) {
     var files = [];
+
     for (var i = fileDump.files.length - 1; i >= 0; i--) {
       files = files.concat(fileDump.files[i]);
     }
 
     // Upload files from reponse to S3
-    uploadFilesToS3(files, function(err, filenames) {
+    uploadFilesToS3(files, function(err) {
       if (err) {
         return callback(err);
       }
 
       log.info('Finished downloading files');
+
       return callback();
     });
   });
 };
 
-downloadFiles(function(err) {
-  if (err) {
-    log.info('Download to S3 failed !');
-    process.exit(1);
-  }
-
-  log.info('Upload to S3 successful. Proceeding with external database creation');
+/**
+ * Push artifacts to Amazon Redshift and Canvas
+ *
+ * @param  {Function}           callback                Standard callback function
+ */
+var createDatabase = function(callback) {
   sqlTemplates.createRedshiftTemplates(function(err) {
     if (err) {
-      log.error('Redshift database template file generation failed. Ending process.');
-      process.exit(1);
+      log.error({err: err.message}, 'Redshift database template file generation failed. Ending process.');
+
+      return callback(err);
     }
 
     redshiftSetUp.createCanvasDb(function(err) {
       if (err) {
-        log.error({err: err}, 'Canvas Data restore on Redshift instance failed');
-        process.exit(1);
+        log.error({err: err.message}, 'Canvas Data restore on Redshift instance failed');
+
+        return callback(err);
       }
 
       log.info('Canvas Data instance created on Redshift. Now available for querying.');
-    });
 
+      return callback();
+    });
   });
-});
+};
+
+var run = function() {
+  migrateDataToS3(function(err) {
+    if (err) {
+      log.info({err: err}, 'Failed to migrate data to S3');
+      process.exit(1);
+    }
+
+    log.info('Data migration was successful. Next, create/update database');
+
+    createDatabase(function(err) {
+      if (err) {
+        log.info({err: err}, 'Failed to migrate data to S3');
+        process.exit(1);
+      }
+
+      log.info('Failed to migrate data to S3');
+    });
+  });
+};
+
+run();

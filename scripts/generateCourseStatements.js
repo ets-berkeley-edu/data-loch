@@ -108,9 +108,9 @@ var generateStatements = function(callback) {
         return 1;
       } else if (a.timestamp < b.timestamp) {
         return -1;
-      } else {
-        return 0;
       }
+
+      return 0;
     });
 
     // Get the last event for every supplied course
@@ -136,7 +136,10 @@ var generateStatements = function(callback) {
         if (_.get(statement, 'object.id') === course_id || _.get(statement, 'context.contextActivities.grouping.id') === course_id) {
           write = true;
         // B. The event actor is a login or logout event for a student enrolled in the course
-        } else if (course.enrollments[statement.actor.account.name] && (statement.verb.id === 'https://brindlewaye.com/xAPITerms/verbs/loggedin' || statement.verb.id === 'https://brindlewaye.com/xAPITerms/verbs/loggedout')) {
+        } else if (course.enrollments[statement.actor.account.name] && (
+          statement.verb.id === 'https://brindlewaye.com/xAPITerms/verbs/loggedin' ||
+          statement.verb.id === 'https://brindlewaye.com/xAPITerms/verbs/loggedout'
+        )) {
           // Only include the statement if it happened after the course started and before it ended
           var timestamp = moment(statement.timestamp).utc();
           var course_start = moment(course.course.created_at).utc();
