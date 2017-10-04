@@ -29,7 +29,7 @@ var config = require('config');
 var csv = require('fast-csv');
 var fs = require('fs');
 
-var log = require('../lib/logger');
+var log = require('../lib/logger')('sync');
 var redshiftUtil = require('../lib/util');
 var schema = require('../lib/schema');
 

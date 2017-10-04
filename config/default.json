@@ -28,6 +28,19 @@
       "host": "redshift cluster"
     }
   },
+  "logger": {
+    "streams": [
+      {
+        "level": "info",
+        "stream": "stdout"
+      },
+      {
+        "level": "debug",
+        "path": "logs/app.log"
+      }
+    ],
+    "useColor": false
+  },
   "lrs": {
     "endpoint": "https://localhost/api/statements",
     "username": "username",
