@@ -48,6 +48,5 @@ gulp.task('travis', function() {
   // Set the environment
   process.env.NODE_ENV = 'travis';
 
-  // TODO: tests?
   runSequence('eslint');
 });

@@ -26,7 +26,7 @@
 var _ = require('lodash');
 
 var log = require('../lib/logger')('getCoursesMostGrades');
-var RedshiftData = require('../lib/data');
+var redshiftData = require('../lib/data');
 
 var argv = require('yargs')
   .usage('Usage: $0 --max-old-space-size=8192')
@@ -37,9 +37,9 @@ var argv = require('yargs')
 var submissions = {};
 var progress = 0;
 
-RedshiftData.getCourses('merged', function(courses) {
-  RedshiftData.getAssignments('merged', function(assignments) {
-    RedshiftData.getAssignmentSubmissions('merged', function(submission, done) {
+redshiftData.getCourses('merged', function(courses) {
+  redshiftData.getAssignments('merged', function(assignments) {
+    redshiftData.getAssignmentSubmissions('merged', function(submission, done) {
       progress++;
       if (progress % 1000 === 0) {
         log.info('Processed ' + progress + ' submissions');
