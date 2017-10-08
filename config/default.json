@@ -50,10 +50,10 @@
     "name": "bCourses",
     "url": "https://bcourses.berkeley.edu"
   },
-  "redshift": {
-    "apiKey": "instructure apikey",
-    "apiSecret": "instructure secret",
-    "host": "api.inshosteddata.com",
+  "canvasDataApi": {
+    "key": "some key",
+    "secret": "some secret",
+    "host": "foo.instructure.com",
     "https": true
   },
   "statements": {

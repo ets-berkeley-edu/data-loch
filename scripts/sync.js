@@ -50,13 +50,13 @@ var argv = require('yargs')
  */
 var downloadFiles = function(callback) {
   // Get the table names
-  redshiftUtil.canvasDataApiRequest('/file/latest', function(latestDump) {
+  canvas.dataApiRequest('/file/latest', function(latestDump) {
     var tables = _.keys(latestDump.artifactsByTable);
 
     async.eachSeries(tables, function(table, done) {
       // Get the list of dumps for each table
       log.info({table: table}, 'Processing table');
-      redshiftUtil.canvasDataApiRequest('/file/byTable/' + table, function(tableDump) {
+      canvas.dataApiRequest('/file/byTable/' + table, function(tableDump) {
         var full = _.find(tableDump.history, {partial: false});
 
         if (!full) {
@@ -124,5 +124,8 @@ var mergeFiles = function(callback) {
 };
 
 downloadFiles(function() {
-  // mergeFiles(function() {});
+  // XXX: currently disabled
+  // mergeFiles(function() {
+  //   log.info('Done with download and merge');
+  // });
 });

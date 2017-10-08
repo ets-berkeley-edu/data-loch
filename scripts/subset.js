@@ -420,7 +420,7 @@ var generateSubsetWikis = function(subpopulation_users, subpopulation_courses, s
  */
 var generateSubsetRequests = function(subpopulation_users, subpopulation_courses, subpopulation_terms, callback) {
   // Get the full list of request data files
-  redshiftUtil.canvasDataApiRequest('/file/byTable/requests', function(tableDump) {
+  canvas.dataApiRequest('/file/byTable/requests', function(tableDump) {
     var full = _.find(tableDump.history, {partial: false});
     if (!full) {
       log.warn('Unable to find full dump for requests table');
@@ -456,10 +456,14 @@ var generateSubsetRequests = function(subpopulation_users, subpopulation_courses
           .pipe(fs.createWriteStream('./data/subset/requests', {flags: 'a'}))
           .on('finish', function() {
             var end = Date.now();
+
             log.info({file: filename, duration: end - start, retained: retainedRows}, 'Finished generating a subset for requests file');
+
             // Delete the downloaded file
-            fs.unlinkSync('./data/base/' + filename);
-            return done();
+            fs.unlink('./data/base/' + filename, function() {
+
+              return done();
+            });
           });
       });
     }, function() {
