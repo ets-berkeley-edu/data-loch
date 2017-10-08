@@ -12,6 +12,20 @@ and recognize the schematics of the data. This eliminates the need having a long
 compute cluster with storage capabilities. The external schemas created can be accessed via multiple
 compute layers without duplication of data.
 
+## Installation
+
+### Create database
+
+```
+createuser data_processor --no-createdb --no-superuser --no-createrole --pwprompt
+createdb institutional_learning_data --owner=data_processor
+psql institutional_learning_data -U data_processor -f scripts/db/schema.sql
+```
+
+### Build
+
+`npm install`
+
 ## Deployment
 
 ### Install AWS CLI and EB CLI
