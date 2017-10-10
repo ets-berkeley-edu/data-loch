@@ -7,26 +7,38 @@
     },
     "s3": {
       "bucket": "xyz",
-      "region": "us-east-1",
-      "directory": "xyz/abc"
+      "directory": "xyz/abc",
+      "region": "us-east-1"
     }
   },
   "canvas": {
     "apiKey": "apiKey"
   },
+  "canvasDataApi": {
+    "host": "foo.instructure.com",
+    "https": true,
+    "key": "some key",
+    "secret": "some secret"
+  },
   "dataLake": {
     "canvasData": {
       "externalDatabase": "database",
-      "s3Location": "s3://path/to/db",
-      "iamRole": "iam role"
+      "iamRole": "iam role",
+      "s3Location": "s3://path/to/db"
     },
     "redshiftSpectrum": {
-      "user": "username",
       "database": "database",
+      "host": "redshift cluster",
       "password": "password",
       "port": 5439,
-      "host": "redshift cluster"
+      "user": "username"
     }
+  },
+  "ingest": {
+    "enabled": false,
+    "cronTime": "0 * * * *",
+    "lastExecutionDate": null,
+    "runOnInit": true
   },
   "logger": {
     "streams": [
@@ -49,12 +61,6 @@
   "platform": {
     "name": "bCourses",
     "url": "https://bcourses.berkeley.edu"
-  },
-  "canvasDataApi": {
-    "key": "some key",
-    "secret": "some secret",
-    "host": "foo.instructure.com",
-    "https": true
   },
   "statements": {
     "type": "caliper"

@@ -24,17 +24,24 @@ psql institutional_learning_data -U data_processor -f scripts/db/schema.sql
 
 ### Build
 
-`npm install`
-
-## Deployment
-
-### Install AWS CLI and EB CLI
-
 ```
 # .nvmrc file has preferred Node version
 nvm use
 npm install
-node scripts/syncToS3.js
+```
+
+## Run
+
+### Sync DataLake with contents of Canvas Data API
+
+`node scripts/syncToS3.js`
+
+### DataLake-to-database copy with cron-like task manager
+
+1. Configure the Ingest job. The `ingest.cronTime` config must have a [valid cron pattern](http://crontab.org).
+1. Start the Ingest job with:
+```
+node app
 ```
 
 ## Note
