@@ -55,11 +55,6 @@ var uploadFilesToS3 = module.exports.uploadFilesToS3 = function(files, callback)
 
     log.info({file: filename}, 'Starting Canvas data file download');
 
-    // TODO: Requests table has about 2000 partitions of 500 MB each. Load it separately.
-    if (table === 'requests') {
-      log.info({file: filename}, 'Skipping requests upload');
-      return done();
-    }
     var options = {
       uri: file.url,
       encoding: null
@@ -95,6 +90,37 @@ var uploadFilesToS3 = module.exports.uploadFilesToS3 = function(files, callback)
 };
 
 /**
+ * Retrieves latest requests filenames and urls corresponding to the current date.
+ *
+ * @param  {Function}           callback                    Standard callback function
+ * @param  {String[]}           callback.requestsFiles      The filenames of the files that have been downloaded
+ */
+var getLatestRequestFiles = function(callback) {
+  var files = [];
+  var requestsFiles = [];
+  canvas.dataApiRequest('/file/latest', function(latestDump) {
+    files = latestDump.artifactsByTable.requests.files;
+
+    async.eachSeries(files, function(file, done) {
+      var requestsFile = {
+        filename: file.filename,
+        table: 'requests',
+        url: file.url
+      };
+
+      requestsFiles.push(requestsFile);
+      return done();
+
+    }, function() {
+      log.info('Added all request files !');
+      return callback(requestsFiles);
+
+    });
+  });
+};
+
+
+/**
  * Download and unzip a set of Canvas Redshift data files and then upload to Amazon S3
  *
  * @param  {Function}           callback                Standard callback function
@@ -105,20 +131,36 @@ var migrateDataToS3 = function(callback) {
     var files = [];
 
     _.each(fileDump.files, function(file) {
-      files.push(file);
+      // Skip adding request files. We will be adding only latest request files in the next step.
+      if (file.table !== 'requests') {
+        files.push(file);
+      }
     });
 
-    // Upload files from reponse to S3
-    uploadFilesToS3(files, function(err) {
-      if (err) {
-        log.error({err: err.message}, 'Failed to upload Canvas Data files to Amazon S3');
+    // Get only the latest request files for the current date and add it to the finalized files
+    // to be downloaded.
+    getLatestRequestFiles(function(requestsFiles) {
 
-        return callback(err);
-      }
+      async.eachSeries(requestsFiles, function(file, done) {
+        files.push(file);
+        return done();
 
-      log.info('Canvas Data files have been uploaded to Amazon S3');
+      }, function() {
+        log.info('Added sync files for requests');
 
-      return callback();
+        uploadFilesToS3(files, function(err) {
+          if (err) {
+            log.error({err: err.message}, 'Failed to upload Canvas Data files to Amazon S3');
+
+            return callback(err);
+          }
+
+          log.info('Canvas Data files have been uploaded to Amazon S3');
+
+          return callback();
+        });
+      });
+
     });
   });
 };
@@ -159,14 +201,14 @@ var run = function() {
     }
 
     log.info('Data migration was successful. Next, create/update database');
-
+    // Drop and create external database and tables.
     createDatabase(function(err) {
       if (err) {
         log.info({err: err}, 'Failed to migrate data to S3');
         process.exit(1);
       }
 
-      log.info('Failed to migrate data to S3');
+      log.info('Database sync complete !');
     });
   });
 };
