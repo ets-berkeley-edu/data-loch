@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "async": "2.5.0",
-    "aws-sdk": "2.104.0",
+    "aws-sdk": "2.141.0",
     "bunyan": "2.0.2",
     "bunyan-prettystream": "0.1.3",
     "config": "1.26.2",

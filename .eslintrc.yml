@@ -78,7 +78,7 @@ rules:
   max-nested-callbacks:
     - 2
     - 13
-  new-cap: 2
+  new-cap: 0
   new-parens: 2
   no-alert: 2
   no-array-constructor: 2
@@ -169,23 +169,11 @@ rules:
   no-unneeded-ternary: 2
   no-unreachable: 2
   no-unused-expressions: 2
-  no-unused-vars:
-    - 1
-    - vars: all
-      args: after-used
-      argsIgnorePattern: ".*"
-      caughtErrorsIgnorePattern: "^ignore"
-      varsIgnorePattern: "exports|argv"
+  no-unused-vars: 0
   no-use-before-define: 0
   no-useless-escape: 0
   no-void: 2
-  no-warning-comments:
-    - 1
-    - terms:
-        - todo
-        - fixme
-        - xxx
-      location: start
+  no-warning-comments: 0
   no-with: 2
   object-curly-newline:
     - 2
