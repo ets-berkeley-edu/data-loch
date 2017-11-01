@@ -30,7 +30,7 @@ var request = require('request');
 var canvas = require('../lib/store/canvas');
 var log = require('../lib/logger')('syncToS3');
 var redshift = require('../lib/store/redshift');
-var sqlTemplates = require('../lib/store/generateRedshiftFiles');
+var sqlGenerator = require('../lib/store/sqlGenerator');
 var storage = require('../lib/store/storage.js');
 
 var argv = require('yargs')
@@ -171,7 +171,7 @@ var migrateDataToS3 = function(callback) {
  * @param  {Function}           callback                Standard callback function
  */
 var createDatabase = function(callback) {
-  sqlTemplates.createRedshiftTemplates(function(err) {
+  sqlGenerator.createRedshiftTemplates(function(err) {
     if (err) {
       log.error({err: err.message}, 'Redshift database template file generation failed. Ending process.');
 

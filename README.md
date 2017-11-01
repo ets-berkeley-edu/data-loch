@@ -18,8 +18,8 @@ compute layers without duplication of data.
 
 ```
 createuser data_processor --no-createdb --no-superuser --no-createrole --pwprompt
-createdb institutional_learning_data --owner=data_processor
-psql institutional_learning_data -U data_processor -f scripts/db/schema.sql
+createdb lakeview --owner=data_processor
+psql lakeview -U data_processor -f scripts/db/schema.sql
 ```
 
 ### Build
@@ -36,12 +36,12 @@ npm install
 
 `node scripts/syncToS3.js`
 
-### DataLake-to-database copy with cron-like task manager
+### Refresh the DataLake views. The views give fast access to enrollment and assignment data.
 
-1. Configure the Ingest job. The `ingest.cronTime` config must have a [valid cron pattern](http://crontab.org).
-1. Start the Ingest job with:
+1. Configure the cron-like job. The `dataLake.cronJob.interval` config must have a [valid cron pattern](http://crontab.org).
+1. Start the cron job with:
 ```
-node app
+NODE_ENV=production node ./scripts/startCron.js
 ```
 
 ## Note

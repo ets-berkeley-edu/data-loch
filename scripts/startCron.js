@@ -23,50 +23,43 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
+var _ = require('lodash');
 var config = require('config');
 var cron = require('cron');
-var log = require('../logger')('ingestRunner');
+var log = require('../lib/logger')('startCron');
 
-var cronTime = config.get('ingest.cronTime');
-var ingestJob = null;
 // TODO: Consider storing 'lastExecutionDate' in the db
-var lastExecutionDate = config.get('ingest.lastExecutionDate');
+var job = null;
+var lastExecutionDate = null;
+var tasks = [ require('../lib/cronTasks/refreshDataLakeViews') ];
 
 /**
- * Scan the DataLake and update db accordingly.
- *
- * @param  {Function}     [callback]            Standard callback function
+ * A set of tasks run synchronously.
  */
-var ingestTask = function(callback) {
-  // If runOnInit=true then 'ingestJob' will be null on first iteration
-  lastExecutionDate = ingestJob ? ingestJob.lastDate() : lastExecutionDate;
+var runTasks = function(callback) {
+  // Run all tasks
+  var done = _.after(tasks.length, callback);
 
-  log.info('Ingest task is starting...');
+  _.each(tasks, function(task, index) {
+    task.run(function(err) {
 
-  return callback();
+      return done(err);
+    });
+  });
 };
 
 /**
- * This function is invoked when the ingest task is complete.
- */
-var onComplete = function() {
-  if (ingestJob) {
-    log.info('This iteration is complete. The task will again at ' + ingestJob.nextDates(1));
-  }
-};
-
-/**
- * Configure and start a cron-like job that will execute the Ingest task per cronTime config.
+ * Configure and start a cron-like job that will execute the task per 'interval' config.
  *
  * @param  {Function}     [callback]            Standard callback function
  */
-var scheduleIngest = function(callback) {
+var schedule = function(callback) {
   try {
-    var runOnInit = Boolean(config.get('ingest.runOnInit'));
+    var runOnInit = Boolean(config.get('dataLake.cronJob.runOnInit'));
 
-    ingestJob = new cron.CronJob({
-      cronTime: config.get('ingest.cronTime'),
-      onTick: ingestTask,
+    job = new cron.CronJob({
+      cronTime: config.get('dataLake.cronJob.interval'),
+      onTick: runTasks,
       onComplete: onComplete,
       runOnInit: runOnInit,
       start: true,
@@ -74,7 +67,7 @@ var scheduleIngest = function(callback) {
     });
 
     if (!runOnInit) {
-      log.info('The first task will run at ' + ingestJob.nextDates(1));
+      log.info('The first task will run at ' + job.nextDates(1));
     }
 
     return callback();
@@ -84,19 +77,37 @@ var scheduleIngest = function(callback) {
   }
 };
 
-var start = module.exports.start = function(callback) {
-  var ingestEnabled = Boolean(config.get('ingest.enabled'));
+/**
+ * This function is invoked when the 'scrape' task is complete.
+ */
+var onComplete = function() {
+  if (job) {
+    log.info('Cron has completed a round of the requested tasks; the job will run again at ' + job.nextDates(1));
+  }
+};
 
-  if (ingestEnabled) {
-    log.info('Ingest job is enabled; it will run according to the \'ingest.cronTime\' schedule.');
+var start = function(callback) {
+  var enabled = Boolean(config.get('dataLake.cronJob.enabled'));
 
-    scheduleIngest(function(err) {
+  if (enabled) {
+    schedule(function(err) {
       if (err) {
-        log.error({err: err}, 'We might have an invalid \'ingest.cronTime\' configuration.');
+        log.error({err: err}, 'We might have an invalid \'dataLake.cronJob.interval\' configuration.');
       }
+
+      return callback();
     });
 
   } else {
-    log.warn('Ingest is disabled. DataLake scans and db updates will not happen.');
+    log.warn('This cron job is disabled. DataLake scans and db updates will not happen.');
+
+    return callback();
   }
 };
+
+// This cron-like job keeps BOAC datasource synced with the DataLake.
+start(function(callback) {
+  log.info('Cron started.');
+
+  return;
+});

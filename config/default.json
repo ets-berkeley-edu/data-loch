@@ -32,13 +32,12 @@
       "password": "password",
       "port": 5439,
       "user": "username"
+    },
+    "cronJob": {
+      "enabled": false,
+      "cronTime": "0 * * * *",
+      "runOnInit": true
     }
-  },
-  "ingest": {
-    "enabled": false,
-    "cronTime": "0 * * * *",
-    "lastExecutionDate": null,
-    "runOnInit": true
   },
   "logger": {
     "streams": [
