@@ -31,7 +31,7 @@ var log = require('../lib/logger')('startCron');
 // TODO: Consider storing 'lastExecutionDate' in the db
 var job = null;
 var lastExecutionDate = null;
-var tasks = [ require('../lib/cronTasks/refreshDataLakeViews') ];
+var tasks = [ require('../lib/cron-tasks/refreshDataLakeViews') ];
 
 /**
  * A set of tasks run synchronously.
