@@ -26,7 +26,7 @@
       "iamRole": "iam role",
       "s3Location": "s3://path/to/db"
     },
-    "redshiftSpectrum": {
+    "db": {
       "database": "database",
       "host": "redshift cluster",
       "password": "password",
