@@ -1,6 +1,6 @@
-# Canvas Data Processor
+# Data Loch
 
-Canvas Data Processor scripts interact with [Instructure's Canvas Data service](https://community.canvaslms.com/community/answers/data), which is refreshed daily.
+Data Loch scripts interact with [Instructure's Canvas Data service](https://community.canvaslms.com/community/answers/data), which is refreshed daily.
 
 We store Canvas data in Amazon S3 for future processing. Steps:
 1. download Canvas data
@@ -42,6 +42,6 @@ NODE_ENV=production node ./scripts/startCron.js
 
 ## Note
 
-Canvas Data Processor also includes scripts that:
+Data Loch also includes scripts that:
 * download Canvas data dumps to your local filesystem
 * translate activities into xAPI and Caliper formats
