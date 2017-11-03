@@ -33,5 +33,6 @@ node_modules
 config/*.json
 !config/default.json
 
-# SQL Template files
-lib/store/db-templates/*.sql
+# Template-generated SQL scripts
+scripts/dbCreation.sql
+scripts/dbRepoint.sql

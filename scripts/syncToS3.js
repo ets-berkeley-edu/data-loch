@@ -29,13 +29,12 @@ var request = require('request');
 
 var canvas = require('../lib/store/canvas');
 var log = require('../lib/logger')('syncToS3');
-var redshift = require('../lib/store/redshift');
-var sqlGenerator = require('../lib/store/sqlGenerator');
+var db = require('../lib/store/db');
 var storage = require('../lib/store/storage.js');
 
 var argv = require('yargs')
   .usage('Usage: $0 --max-old-space-size=8192')
-  .describe('u', 'Download the latest Canvas Redshift data files')
+  .describe('u', 'Download the latest Canvas Data files')
   .help('h')
   .alias('h', 'help')
   .argv;
@@ -43,7 +42,7 @@ var argv = require('yargs')
 /**
  * Upload the compressed data files for each table from Canvas Data on to S3 buckets.
  *
- * @param  {Object[]}           files                   The Canvas Redshift data files to download and unzip
+ * @param  {Object[]}           files                   The Canvas data files to download and unzip
  * @param  {Function}           callback                Standard callback function
  * @param  {String[]}           callback.filenames      The filenames of the files that have been downloaded
  */
@@ -119,9 +118,8 @@ var getLatestRequestFiles = function(callback) {
   });
 };
 
-
 /**
- * Download and unzip a set of Canvas Redshift data files and then upload to Amazon S3
+ * Download and unzip a set of Canvas Data files and then upload to Amazon S3
  *
  * @param  {Function}           callback                Standard callback function
  */
@@ -165,33 +163,6 @@ var migrateDataToS3 = function(callback) {
   });
 };
 
-/**
- * Push artifacts to Amazon Redshift and Canvas
- *
- * @param  {Function}           callback                Standard callback function
- */
-var createDatabase = function(callback) {
-  sqlGenerator.createRedshiftTemplates(function(err) {
-    if (err) {
-      log.error({err: err.message}, 'Redshift database template file generation failed. Ending process.');
-
-      return callback(err);
-    }
-
-    redshift.createDatabase(function(err) {
-      if (err) {
-        log.error({err: err.message}, 'Canvas Data restore on Redshift instance failed');
-
-        return callback(err);
-      }
-
-      log.info('Canvas Data instance has been created on Redshift.');
-
-      return callback();
-    });
-  });
-};
-
 var run = function() {
   migrateDataToS3(function(err) {
     if (err) {
@@ -202,7 +173,7 @@ var run = function() {
 
     log.info('Data migration was successful. Next, create/update database');
     // Drop and create external database and tables.
-    createDatabase(function(err) {
+    db.loadSchema(function(err) {
       if (err) {
         log.info({err: err}, 'Failed to migrate data to S3');
         process.exit(1);

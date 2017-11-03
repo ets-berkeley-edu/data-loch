@@ -14,14 +14,6 @@ compute layers without duplication of data.
 
 ## Installation
 
-### Create database
-
-```
-createuser data_processor --no-createdb --no-superuser --no-createrole --pwprompt
-createdb lakeview --owner=data_processor
-psql lakeview -U data_processor -f scripts/db/schema.sql
-```
-
 ### Build
 
 ```
@@ -30,13 +22,17 @@ nvm use
 npm install
 ```
 
+### Create and populate database
+
+Create RedShift schema, download files from Canvas Data API and populate db.
+
+```
+node scripts/syncToS3.js
+```
+
 ## Run
 
-### Sync DataLake with contents of Canvas Data API
-
-`node scripts/syncToS3.js`
-
-### Refresh the DataLake views. The views give fast access to enrollment and assignment data.
+Refresh the DataLake views. The views give fast access to enrollment and assignment data.
 
 1. Configure the cron-like job. The `dataLake.cronJob.interval` config must have a [valid cron pattern](http://crontab.org).
 1. Start the cron job with:
