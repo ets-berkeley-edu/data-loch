@@ -1,10 +1,10 @@
 {
-  "name": "canvas-data-processor",
+  "name": "data-loch",
   "description": "Instructure Canvas Redshift Processor",
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ets-berkeley-edu/canvas-data-processor.git"
+    "url": "git://github.com/ets-berkeley-edu/data-loch.git"
   },
   "dependencies": {
     "async": "2.5.0",
