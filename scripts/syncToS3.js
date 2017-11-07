@@ -29,7 +29,6 @@ var request = require('request');
 
 var canvas = require('../lib/store/canvas');
 var log = require('../lib/logger')('syncToS3');
-var db = require('../lib/store/db');
 var storage = require('../lib/store/storage.js');
 
 var argv = require('yargs')
@@ -135,10 +134,8 @@ var migrateDataToS3 = function(callback) {
       }
     });
 
-    // Get only the latest request files for the current date and add it to the finalized files
-    // to be downloaded.
+    // Get latest request files for current date and add it to the finalized files to be downloaded.
     getLatestRequestFiles(function(requestsFiles) {
-
       async.eachSeries(requestsFiles, function(file, done) {
         files.push(file);
         return done();
@@ -152,13 +149,11 @@ var migrateDataToS3 = function(callback) {
 
             return callback(err);
           }
-
           log.info('Canvas Data files have been uploaded to Amazon S3');
 
           return callback();
         });
       });
-
     });
   });
 };
@@ -170,17 +165,7 @@ var run = function() {
 
       process.exit(1);
     }
-
-    log.info('Data migration was successful. Next, create/update database');
-    // Drop and create external database and tables.
-    db.loadSchema(function(err) {
-      if (err) {
-        log.info({err: err}, 'Failed to migrate data to S3');
-        process.exit(1);
-      }
-
-      log.info('Database sync complete !');
-    });
+    log.info('Successfully migrated Canvas Data to Amazon S3.');
   });
 };
 
