@@ -23,30 +23,28 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-var storage = require('../store/storage');
+var _ = require('lodash');
+var assert = require('assert');
+var bignum = require('bignum');
 
-var config = require('config');
-var log = require('../logger')('refreshDataLakeViews');
+var constants = require('../lib/store/constants');
 
-/**
- * Scour the DataLake for data on enrollments, assignments, etc.
- *
- * @param  {Function}     [callback]            Standard callback function
- */
-var run = module.exports.run = function(callback) {
-  var year = 2017;
-  var semesterCode = 'D';
-  var uids = [1015552, 1031541];
+describe('bCourses enrollment id mappings', function() {
+  var baseId = '10720000000000000';
 
-  log.info('The \'refreshDataLakeViews\' task is starting...');
+  it('should return Canvas Data id for Spring 2018', function() {
+    var value = constants.BCOURSES.ENROLLMENT_TERM['2018B'];
 
-  storage.getEnrollments(year, semesterCode, uids, function(err, data) {
-    if (err) {
-      log.error({err: err, year: year, semesterCode: semesterCode, uids: uids}, 'Failed query for enrollments');
-
-      return callback(err);
-    }
-
-    return callback();
+    assert.strictEqual(bignum(value).mod(baseId).toNumber(), 5497);
   });
-};
+
+  it('should return Canvas Data id within a particular range', function() {
+    _.each(constants.BCOURSES.ENROLLMENT_TERM, function(value, key) {
+      assert.ok(bignum(value).mod(baseId) < 6000);
+    });
+  });
+
+  it('should return null for invalid term', function() {
+    assert.ok(!constants.BCOURSES.ENROLLMENT_TERM['2017F']);
+  });
+});

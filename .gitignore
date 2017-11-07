@@ -34,5 +34,5 @@ config/*.json
 !config/default.json
 
 # Template-generated SQL scripts
-scripts/dbCreation.sql
-scripts/dbRepoint.sql
+sql/dbCreation.sql
+sql/dbRepoint.sql
