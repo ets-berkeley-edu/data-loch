@@ -27,7 +27,7 @@ var _ = require('lodash');
 var assert = require('assert');
 var bignum = require('bignum');
 
-var constants = require('../lib/store/constants');
+var constants = require('../lib/process/constants');
 
 describe('bCourses enrollment id mappings', function() {
   var baseId = '10720000000000000';

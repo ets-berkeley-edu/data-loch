@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Copyright ©2017. The Regents of the University of California (Regents). All Rights Reserved.
+ * Copyright ©2016. The Regents of the University of California (Regents). All Rights Reserved.
  *
  * Permission to use, copy, modify, and distribute this software and its documentation
  * for educational, research, and not-for-profit purposes, without fee and without a
@@ -25,4 +25,22 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-// TODO: Sandeep has canvas-data-copy code for app.js
+var DataLoch = require('./lib/core/api');
+var Cron = require('./lib/cron/startCron');
+var log = DataLoch.logger('app');
+
+// Initialize the app server
+DataLoch.init(function(err) {
+  if (err) {
+    return log.error({'err': err}, 'An error has occured while starting the Data Loch');
+  }
+
+  log.info('Data Loch Server has started. Brace yourself for awesomeness');
+
+  Cron.start(function(callback) {
+    log.info('Cron started.');
+
+    return;
+  });
+
+});

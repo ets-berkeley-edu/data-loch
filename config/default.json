@@ -4,15 +4,7 @@
       "accessKeyId": "key",
       "secretAccessKey": "secret",
       "region": "us-east-1"
-    },
-    "s3": {
-      "bucket": "xyz",
-      "directory": "xyz/abc",
-      "region": "us-east-1"
     }
-  },
-  "canvas": {
-    "apiKey": "apiKey"
   },
   "canvasDataApi": {
     "host": "foo.instructure.com",
@@ -51,18 +43,5 @@
       }
     ],
     "useColor": false
-  },
-  "lrs": {
-    "endpoint": "https://localhost/api/statements",
-    "username": "username",
-    "password": "password"
-  },
-  "platform": {
-    "name": "bCourses",
-    "url": "https://bcourses.berkeley.edu"
-  },
-  "statements": {
-    "type": "caliper"
-  },
-  "storage": "/path/to/local/store"
+  }
 }
