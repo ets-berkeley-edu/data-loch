@@ -2,11 +2,11 @@
 -- DROP and CREATE
 --------------------------------------------------------------------
 
-DROP SCHEMA <%= externalDatabase %>;
+DROP SCHEMA <%= externalSchema %>;
 
-CREATE EXTERNAL SCHEMA <%= externalDatabase %>
+CREATE EXTERNAL SCHEMA <%= externalSchema %>
 FROM data catalog
-DATABASE '<%= externalDatabase %>'
+DATABASE '<%= externalSchema %>'
 IAM_ROLE '<%= iamRole %>'
 CREATE EXTERNAL DATABASE IF NOT EXISTS;
 
@@ -15,9 +15,9 @@ CREATE EXTERNAL DATABASE IF NOT EXISTS;
 --------------------------------------------------------------------
 
 -- user_dim
-DROP TABLE <%= externalDatabase %>.user_dim;
+DROP TABLE <%= externalSchema %>.user_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.user_dim (
+CREATE EXTERNAL TABLE <%= externalSchema %>.user_dim (
   id BIGINT,
   canvas_id BIGINT,
   root_account_id BIGINT,
@@ -38,12 +38,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.user_dim (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/user_dim';
+LOCATION '<%= s3DailyLocation %>/user_dim';
 
 -- pseudonym_dim
-DROP TABLE <%= externalDatabase %>.pseudonym_dim;
+DROP TABLE <%= externalSchema %>.pseudonym_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.pseudonym_dim (
+CREATE EXTERNAL TABLE <%= externalSchema %>.pseudonym_dim (
   id BIGINT,
   canvas_id BIGINT,
   user_id BIGINT,
@@ -67,12 +67,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.pseudonym_dim (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/pseudonym_dim';
+LOCATION '<%= s3DailyLocation %>/pseudonym_dim';
 
 -- course_dim
-DROP TABLE <%= externalDatabase %>.course_dim;
+DROP TABLE <%= externalSchema %>.course_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.course_dim (
+CREATE EXTERNAL TABLE <%= externalSchema %>.course_dim (
   id BIGINT,
   canvas_id BIGINT,
   root_account_id BIGINT,
@@ -92,12 +92,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.course_dim (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/course_dim';
+LOCATION '<%= s3DailyLocation %>/course_dim';
 
 -- course_section_dim
-DROP TABLE <%= externalDatabase %>.course_section_dim;
+DROP TABLE <%= externalSchema %>.course_section_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.course_section_dim (
+CREATE EXTERNAL TABLE <%= externalSchema %>.course_section_dim (
   id BIGINT,
   canvas_id BIGINT,
   name VARCHAR,
@@ -118,12 +118,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.course_section_dim (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/course_section_dim';
+LOCATION '<%= s3DailyLocation %>/course_section_dim';
 
 -- enrollment_fact
-DROP TABLE <%= externalDatabase %>.enrollment_fact;
+DROP TABLE <%= externalSchema %>.enrollment_fact;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.enrollment_fact(
+CREATE EXTERNAL TABLE <%= externalSchema %>.enrollment_fact(
   enrollment_id BIGINT,
   user_id BIGINT,
   course_id BIGINT,
@@ -136,12 +136,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.enrollment_fact(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/enrollment_fact';
+LOCATION '<%= s3DailyLocation %>/enrollment_fact';
 
 -- enrollment_dim
-DROP TABLE <%= externalDatabase %>.enrollment_dim;
+DROP TABLE <%= externalSchema %>.enrollment_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.enrollment_dim(
+CREATE EXTERNAL TABLE <%= externalSchema %>.enrollment_dim(
   id BIGINT,
   canvas_id BIGINT,
   root_account_id BIGINT,
@@ -162,12 +162,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.enrollment_dim(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/enrollment_dim';
+LOCATION '<%= s3DailyLocation %>/enrollment_dim';
 
 -- assignment_fact
-DROP TABLE <%= externalDatabase %>.assignment_fact;
+DROP TABLE <%= externalSchema %>.assignment_fact;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.assignment_fact(
+CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_fact(
   assignment_id BIGINT,
   course_id BIGINT,
   course_account_id VARCHAR,
@@ -179,12 +179,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.assignment_fact(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/assignment_fact';
+LOCATION '<%= s3DailyLocation %>/assignment_fact';
 
 -- assignment_dim
-DROP TABLE <%= externalDatabase %>.assignment_dim;
+DROP TABLE <%= externalSchema %>.assignment_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.assignment_dim(
+CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_dim(
   id BIGINT,
   canvas_id BIGINT,
   course_id BIGINT,
@@ -217,12 +217,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.assignment_dim(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/assignment_dim';
+LOCATION '<%= s3DailyLocation %>/assignment_dim';
 
 -- discussion_entry_dim
-DROP TABLE <%= externalDatabase %>.discussion_entry_dim;
+DROP TABLE <%= externalSchema %>.discussion_entry_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_entry_dim(
+CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_entry_dim(
   id BIGINT,
   canvas_id BIGINT,
   message VARCHAR,
@@ -235,12 +235,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_entry_dim(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/discussion_entry_dim';
+LOCATION '<%= s3DailyLocation %>/discussion_entry_dim';
 
 -- discussion_entry_fact
-DROP TABLE <%= externalDatabase %>.discussion_entry_fact;
+DROP TABLE <%= externalSchema %>.discussion_entry_fact;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_entry_fact(
+CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_entry_fact(
   discussion_entry_id BIGINT,
   parent_discussion_entry_id BIGINT,
   user_id BIGINT,
@@ -257,12 +257,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_entry_fact(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/discussion_entry_fact';
+LOCATION '<%= s3DailyLocation %>/discussion_entry_fact';
 
 -- discussion_topic_dim
-DROP TABLE <%= externalDatabase %>.discussion_topic_dim;
+DROP TABLE <%= externalSchema %>.discussion_topic_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_topic_dim(
+CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_topic_dim(
   id BIGINT,
   canvas_id BIGINT,
   title VARCHAR,
@@ -284,12 +284,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_topic_dim(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/discussion_topic_dim';
+LOCATION '<%= s3DailyLocation %>/discussion_topic_dim';
 
 -- discussion_topic_fact
-DROP TABLE <%= externalDatabase %>.discussion_topic_fact;
+DROP TABLE <%= externalSchema %>.discussion_topic_fact;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_topic_fact(
+CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_topic_fact(
   discussion_topic_id BIGINT,
   course_id BIGINT,
   enrollment_term_id BIGINT,
@@ -307,12 +307,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.discussion_topic_fact(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/discussion_topic_fact';
+LOCATION '<%= s3DailyLocation %>/discussion_topic_fact';
 
 -- submission_fact
-DROP TABLE <%= externalDatabase %>.submission_fact;
+DROP TABLE <%= externalSchema %>.submission_fact;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_fact(
+CREATE EXTERNAL TABLE <%= externalSchema %>.submission_fact(
   submission_id BIGINT,
   assignment_id BIGINT,
   course_id BIGINT,
@@ -335,12 +335,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_fact(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/submission_fact';
+LOCATION '<%= s3DailyLocation %>/submission_fact';
 
 -- submission_dim
-DROP TABLE <%= externalDatabase %>.submission_dim;
+DROP TABLE <%= externalSchema %>.submission_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_dim(
+CREATE EXTERNAL TABLE <%= externalSchema %>.submission_dim(
   id BIGINT,
   canvas_id BIGINT,
   body TEXT,
@@ -370,12 +370,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_dim(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/submission_dim';
+LOCATION '<%= s3DailyLocation %>/submission_dim';
 
 -- submission_comment_fact
-DROP TABLE <%= externalDatabase %>.submission_comment_fact;
+DROP TABLE <%= externalSchema %>.submission_comment_fact;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_comment_fact(
+CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_fact(
   submission_comment_id BIGINT,
   submission_id BIGINT,
   recipient_id BIGINT,
@@ -392,12 +392,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_comment_fact(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/submission_comment_fact';
+LOCATION '<%= s3DailyLocation %>/submission_comment_fact';
 
 -- submission_comment_participant_fact
-DROP TABLE <%= externalDatabase %>.submission_comment_participant_fact;
+DROP TABLE <%= externalSchema %>.submission_comment_participant_fact;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_comment_participant_fact(
+CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_participant_fact(
   submission_comment_participant_id BIGINT,
   submission_comment_id BIGINT,
   user_id BIGINT,
@@ -411,12 +411,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_comment_participant_fac
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/submission_comment_participant_fact';
+LOCATION '<%= s3DailyLocation %>/submission_comment_participant_fact';
 
 -- submission_comment_dim
-DROP TABLE <%= externalDatabase %>.submission_comment_dim;
+DROP TABLE <%= externalSchema %>.submission_comment_dim;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_comment_dim(
+CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_dim(
   id BIGINT,
   canvas_id BIGINT,
   submission_id BIGINT,
@@ -435,12 +435,12 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.submission_comment_dim(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/submission_comment_dim';
+LOCATION '<%= s3DailyLocation %>/submission_comment_dim';
 
 -- requests
-DROP TABLE <%= externalDatabase %>.requests;
+DROP TABLE <%= externalSchema %>.requests;
 
-CREATE EXTERNAL TABLE <%= externalDatabase %>.requests(
+CREATE EXTERNAL TABLE <%= externalSchema %>.requests(
   id VARCHAR,
   timestamp TIMESTAMP,
   timestamp_year VARCHAR,
@@ -472,7 +472,7 @@ CREATE EXTERNAL TABLE <%= externalDatabase %>.requests(
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= s3Location %>/requests';
+LOCATION '<%= s3RequestsTermLocation %>/requests';
 
 --------------------------------------------------------------------
 -- (Pseudo) Materialized Views

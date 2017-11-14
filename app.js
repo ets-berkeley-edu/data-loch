@@ -25,4 +25,22 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-// TODO: Sandeep has canvas-data-copy code for app.js
+var dataLoch = require('./lib/core/api');
+var cron = require('./lib/cron/startCron');
+var log = dataLoch.logger('app');
+
+// Initialize the app server
+dataLoch.init(function(err) {
+  if (err) {
+    return log.error({'err': err}, 'An error has occured while starting the Data Loch');
+  }
+
+  log.info('Data Loch Server has started. Brace yourself for awesomeness');
+
+  cron.start(function(callback) {
+    log.info('Cron started.');
+
+    return;
+  });
+
+});

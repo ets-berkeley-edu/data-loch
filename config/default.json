@@ -1,18 +1,14 @@
 {
+  "app": {
+    "https": false,
+    "port": 1234
+  },
   "aws": {
     "credentials": {
       "accessKeyId": "key",
       "secretAccessKey": "secret",
-      "region": "us-east-1"
-    },
-    "s3": {
-      "bucket": "xyz",
-      "directory": "xyz/abc",
-      "region": "us-east-1"
+      "region": "aws region"
     }
-  },
-  "canvas": {
-    "apiKey": "apiKey"
   },
   "canvasDataApi": {
     "host": "foo.instructure.com",
@@ -20,23 +16,43 @@
     "key": "some key",
     "secret": "some secret"
   },
-  "dataLake": {
-    "canvasData": {
-      "externalDatabase": "database",
-      "iamRole": "iam role",
-      "s3Location": "s3://path/to/db"
+  "datalake": {
+    "s3": {
+      "bucket": "bucket name",
+      "region": "aws region"
     },
-    "db": {
-      "database": "database",
-      "host": "redshift cluster",
-      "password": "password",
-      "port": 5439,
-      "user": "username"
+    "canvasData": {
+      "directory": {
+        "currentTerm": "s3/path/to/current/term/folder",
+        "daily": "s3/path/to/daily/folder",
+        "historical": "s3/path/to/historical/folder"
+      },
+      "externalSchema": "external schema name",
+      "iamRole": "iam role"
     },
     "cronJob": {
       "enabled": false,
       "cronTime": "0 * * * *",
-      "runOnInit": true
+      "runOnInit": false
+    },
+    "redshift": {
+      "database": "database",
+      "host": "redshift cluster",
+      "password": "password",
+      "port": 1234,
+      "user": "username"
+    },
+    "worker": {
+      "beanstalk":{
+        "host": "app url",
+        "username": "username",
+        "password": "password"
+      },
+      "lambda": {
+        "apiVersion": "version",
+        "dataSyncService": "sync lambda service name",
+        "region": "aws region"
+      }
     }
   },
   "logger": {
@@ -51,18 +67,5 @@
       }
     ],
     "useColor": false
-  },
-  "lrs": {
-    "endpoint": "https://localhost/api/statements",
-    "username": "username",
-    "password": "password"
-  },
-  "platform": {
-    "name": "bCourses",
-    "url": "https://bcourses.berkeley.edu"
-  },
-  "statements": {
-    "type": "caliper"
-  },
-  "storage": "/path/to/local/store"
+  }
 }
