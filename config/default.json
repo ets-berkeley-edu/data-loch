@@ -1,13 +1,13 @@
 {
   "app": {
     "https": false,
-    "port": 2000
+    "port": 1234
   },
   "aws": {
     "credentials": {
       "accessKeyId": "key",
       "secretAccessKey": "secret",
-      "region": "us-east-1"
+      "region": "aws region"
     }
   },
   "canvasDataApi": {
@@ -19,7 +19,7 @@
   "datalake": {
     "s3": {
       "bucket": "bucket name",
-      "region": "us-east-1"
+      "region": "aws region"
     },
     "canvasData": {
       "directory": {
@@ -39,7 +39,7 @@
       "database": "database",
       "host": "redshift cluster",
       "password": "password",
-      "port": 5439,
+      "port": 1234,
       "user": "username"
     },
     "worker": {
@@ -49,9 +49,9 @@
         "password": "password"
       },
       "lambda": {
-        "apiVersion": "2015-03-31",
+        "apiVersion": "version",
         "dataSyncService": "sync lambda service name",
-        "region": "us-east-1"
+        "region": "aws region"
       }
     }
   },
