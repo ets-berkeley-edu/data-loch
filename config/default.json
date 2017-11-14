@@ -1,4 +1,8 @@
 {
+  "app": {
+    "https": false,
+    "port": 2000
+  },
   "aws": {
     "credentials": {
       "accessKeyId": "key",
@@ -12,23 +16,43 @@
     "key": "some key",
     "secret": "some secret"
   },
-  "dataLake": {
-    "canvasData": {
-      "externalDatabase": "database",
-      "iamRole": "iam role",
-      "s3Location": "s3://path/to/db"
+  "datalake": {
+    "s3": {
+      "bucket": "bucket name",
+      "region": "us-east-1"
     },
-    "db": {
+    "canvasData": {
+      "directory": {
+        "currentTerm": "s3/path/to/current/term/folder",
+        "daily": "s3/path/to/daily/folder",
+        "historical": "s3/path/to/historical/folder"
+      },
+      "externalSchema": "external schema name",
+      "iamRole": "iam role"
+    },
+    "cronJob": {
+      "enabled": false,
+      "cronTime": "0 * * * *",
+      "runOnInit": false
+    },
+    "redshift": {
       "database": "database",
       "host": "redshift cluster",
       "password": "password",
       "port": 5439,
       "user": "username"
     },
-    "cronJob": {
-      "enabled": false,
-      "cronTime": "0 * * * *",
-      "runOnInit": true
+    "worker": {
+      "beanstalk":{
+        "host": "app url",
+        "username": "username",
+        "password": "password"
+      },
+      "lambda": {
+        "apiVersion": "2015-03-31",
+        "dataSyncService": "sync lambda service name",
+        "region": "us-east-1"
+      }
     }
   },
   "logger": {
