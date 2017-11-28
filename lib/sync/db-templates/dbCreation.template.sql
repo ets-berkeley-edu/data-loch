@@ -2,7 +2,7 @@
 -- DROP and CREATE
 --------------------------------------------------------------------
 
-DROP SCHEMA <%= externalSchema %>;
+DROP SCHEMA IF EXISTS <%= externalSchema %> CASCADE;
 
 CREATE EXTERNAL SCHEMA <%= externalSchema %>
 FROM data catalog
@@ -479,9 +479,12 @@ LOCATION '<%= s3RequestsTermLocation %>/requests';
 --------------------------------------------------------------------
 
 -- View used by BOAC
-DROP TABLE berkeley_enrollments_view;
+-- DROP SCHEMA <%= boacSchema %> CASCADE;
 
-CREATE TABLE berkeley_enrollments_view(
+CREATE SCHEMA IF NOT EXISTS <%= boacSchema %>;
+
+DROP TABLE IF EXISTS <%= boacSchema %>.berkeley_enrollments_view;
+CREATE TABLE IF NOT EXISTS <%= boacSchema %>.berkeley_enrollments_view(
   year INTEGER NOT NULL,
   term VARCHAR(8) NOT NULL,
   canvas_course_id INTEGER NOT NULL,
