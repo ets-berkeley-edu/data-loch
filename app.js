@@ -25,12 +25,12 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-var dataLoch = require('./lib/core/api');
+var DataLoch = require('./lib/core/api');
 var cron = require('./lib/cron/startCron');
-var log = dataLoch.logger('app');
+var log = DataLoch.logger('app');
 
 // Initialize the app server
-dataLoch.init(function(err) {
+DataLoch.init(function(err) {
   if (err) {
     return log.error({'err': err}, 'An error has occured while starting the Data Loch');
   }

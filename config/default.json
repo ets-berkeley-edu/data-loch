@@ -28,6 +28,7 @@
         "historical": "s3/path/to/historical/folder"
       },
       "externalSchema": "external schema name",
+      "boacSchema": "boac schema name",
       "iamRole": "iam role"
     },
     "cronJob": {
