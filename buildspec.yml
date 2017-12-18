@@ -1,0 +1,29 @@
+version: 0.1
+
+eb_codebuild_settings:
+  CodeBuildServiceRole: arn:aws:iam::697877139013:role/service-role/codebuild-data-loch-service-role
+  ComputeType: BUILD_GENERAL1_SMALL
+  Image: aws/codebuild/nodejs:6.3.1
+  Timeout: 60
+
+phases:
+  install:
+    commands:
+      - echo "install phase"
+  pre_build:
+    commands:
+      - echo "pre_build phase"
+  build:
+    commands:
+      - echo "build phase"
+  post_build:
+    commands:
+      - echo "post_build phase"
+
+artifacts:
+  files:
+    - '.nvmrc'
+    - '.ebextensions/*'
+    - '.elasticbeanstalk/*'
+    - '.gitignore'
+    - '**/*'
