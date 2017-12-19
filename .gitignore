@@ -34,5 +34,11 @@ config/*.json
 !config/default.json
 
 # Template-generated SQL scripts
-sql/dbCreation.sql
-sql/dbRepoint.sql
+# sql/*
+# sql/dbCreation.sql
+# sql/dbRepoint.sql
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
