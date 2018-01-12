@@ -30,8 +30,8 @@
     "node-redshift": "0.1.5",
     "request": "2.81.0",
     "run-sequence": "2.2.0",
-    "s3-upload-stream": "latest",
-    "xapicaliper":"0.3.0",
+    "s3-upload-stream": "1.0.7",
+    "xapicaliper": "0.3.0",
     "yargs": "8.0.2"
   },
   "engines": {

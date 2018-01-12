@@ -31,10 +31,20 @@
       "boacSchema": "boac schema name",
       "iamRole": "iam role"
     },
-    "cronJob": {
-      "enabled": false,
-      "cronTime": "0 * * * *",
-      "runOnInit": false
+    "cron": {
+        "enabled": false,
+        "tasks": {
+          "syncDumps" : {
+            "interval": "0 0 0/1 * * *",
+            "script": "path/to/script",
+            "runOnInit": false
+          },
+          "syncDb" : {
+            "interval": "0 0 0/1 * * *",
+            "script": "path/to/script",
+            "runOnInit": false
+          }
+        }
     },
     "redshift": {
       "database": "database",
