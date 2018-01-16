@@ -56,15 +56,15 @@ CREATE EXTERNAL TABLE historical_requests (
   user_agent_id	BIGINT,
   http_status	STRING,
   http_version	STRING
-  )
+)
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION 's3://lrs-data-lake/historical/complete/requests/';
+LOCATION 's3://path/to/historical/requests/';
 
 
 
-CREATE EXTERNAL TABLE historical_requests_parquet(
+CREATE EXTERNAL TABLE historical_requests_parquet (
   id	STRING,
   timestamp_full	STRING,
   timestamp_year	STRING,
@@ -92,9 +92,9 @@ CREATE EXTERNAL TABLE historical_requests_parquet(
   user_agent_id	BIGINT,
   http_status	STRING,
   http_version	STRING
-  )
+)
 STORED AS PARQUET
-LOCATION 's3://lrs-data-lake/canvas-data/historical/complete/requests-parquet-snappy/'
+LOCATION 's3://path/to/historical/complete/requests-parquet-snappy/'
 TBLPROPERTIES ("orc.compress"="SNAPPY");
 
 
