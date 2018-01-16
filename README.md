@@ -4,9 +4,9 @@ Data Loch scripts interact with [Instructure's Canvas Data service](https://comm
 
 We store Canvas data in Amazon S3 for future processing. Steps:
 1. download Canvas data
-2. upload data to Amazon S3 (buckets are organized according to the LRS DataLake design)
+2. upload data to Amazon S3 (buckets are organized according to the DataLake design)
 3. using Redshift Spectrum, create schemas/tables in Amazon Athena (data catalog)
-4. Run queries against Redshift tables to prepare data for ASC project
+4. Run queries against Redshift tables to prepare analytics data for ASC project
 
 Amazon S3 is our storage layer, similar to a file system. The compute layers directly access and query
 and recognize the schematics of the data. This eliminates the need having a long continuous running
