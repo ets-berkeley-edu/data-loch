@@ -29,7 +29,8 @@
       },
       "externalSchema": "external schema name",
       "boacSchema": "boac schema name",
-      "iamRole": "iam role"
+      "iamRole": "iam role",
+      "requestsTermRegExp": "regexp for requests file url parsing"
     },
     "cron": {
         "enabled": false,
