@@ -10,6 +10,7 @@
     "assert": "^1.4.1",
     "async": "2.5.0",
     "aws-sdk": "2.141.0",
+    "basic-auth": "2.0.0",
     "bignum": "0.12.5",
     "body-parser": "1.17.1",
     "bunyan": "2.0.2",
