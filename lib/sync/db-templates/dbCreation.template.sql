@@ -40,8 +40,6 @@ CREATE EXTERNAL DATABASE IF NOT EXISTS;
 --------------------------------------------------------------------
 
 -- user_dim
-DROP TABLE <%= externalSchema %>.user_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.user_dim (
   id BIGINT,
   canvas_id BIGINT,
@@ -66,8 +64,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/user_dim';
 
 -- pseudonym_dim
-DROP TABLE <%= externalSchema %>.pseudonym_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.pseudonym_dim (
   id BIGINT,
   canvas_id BIGINT,
@@ -95,8 +91,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/pseudonym_dim';
 
 -- course_dim
-DROP TABLE <%= externalSchema %>.course_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.course_dim (
   id BIGINT,
   canvas_id BIGINT,
@@ -120,8 +114,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/course_dim';
 
 -- course_section_dim
-DROP TABLE <%= externalSchema %>.course_section_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.course_section_dim (
   id BIGINT,
   canvas_id BIGINT,
@@ -146,8 +138,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/course_section_dim';
 
 -- enrollment_fact
-DROP TABLE <%= externalSchema %>.enrollment_fact;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.enrollment_fact(
   enrollment_id BIGINT,
   user_id BIGINT,
@@ -164,8 +154,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/enrollment_fact';
 
 -- enrollment_dim
-DROP TABLE <%= externalSchema %>.enrollment_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.enrollment_dim(
   id BIGINT,
   canvas_id BIGINT,
@@ -190,8 +178,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/enrollment_dim';
 
 -- assignment_fact
-DROP TABLE <%= externalSchema %>.assignment_fact;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_fact(
   assignment_id BIGINT,
   course_id BIGINT,
@@ -207,8 +193,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/assignment_fact';
 
 -- assignment_dim
-DROP TABLE <%= externalSchema %>.assignment_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_dim(
   id BIGINT,
   canvas_id BIGINT,
@@ -245,8 +229,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/assignment_dim';
 
 -- discussion_entry_dim
-DROP TABLE <%= externalSchema %>.discussion_entry_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_entry_dim(
   id BIGINT,
   canvas_id BIGINT,
@@ -263,8 +245,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/discussion_entry_dim';
 
 -- discussion_entry_fact
-DROP TABLE <%= externalSchema %>.discussion_entry_fact;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_entry_fact(
   discussion_entry_id BIGINT,
   parent_discussion_entry_id BIGINT,
@@ -285,8 +265,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/discussion_entry_fact';
 
 -- discussion_topic_dim
-DROP TABLE <%= externalSchema %>.discussion_topic_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_topic_dim(
   id BIGINT,
   canvas_id BIGINT,
@@ -312,8 +290,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/discussion_topic_dim';
 
 -- discussion_topic_fact
-DROP TABLE <%= externalSchema %>.discussion_topic_fact;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_topic_fact(
   discussion_topic_id BIGINT,
   course_id BIGINT,
@@ -335,8 +311,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/discussion_topic_fact';
 
 -- submission_fact
-DROP TABLE <%= externalSchema %>.submission_fact;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.submission_fact(
   submission_id BIGINT,
   assignment_id BIGINT,
@@ -363,8 +337,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/submission_fact';
 
 -- submission_dim
-DROP TABLE <%= externalSchema %>.submission_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.submission_dim(
   id BIGINT,
   canvas_id BIGINT,
@@ -398,8 +370,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/submission_dim';
 
 -- submission_comment_fact
-DROP TABLE <%= externalSchema %>.submission_comment_fact;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_fact(
   submission_comment_id BIGINT,
   submission_id BIGINT,
@@ -420,8 +390,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/submission_comment_fact';
 
 -- submission_comment_participant_fact
-DROP TABLE <%= externalSchema %>.submission_comment_participant_fact;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_participant_fact(
   submission_comment_participant_id BIGINT,
   submission_comment_id BIGINT,
@@ -439,8 +407,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/submission_comment_participant_fact';
 
 -- submission_comment_dim
-DROP TABLE <%= externalSchema %>.submission_comment_dim;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_dim(
   id BIGINT,
   canvas_id BIGINT,
@@ -463,8 +429,6 @@ STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/submission_comment_dim';
 
 -- requests
-DROP TABLE <%= externalSchema %>.requests;
-
 CREATE EXTERNAL TABLE <%= externalSchema %>.requests(
   id VARCHAR,
   timestamp TIMESTAMP,
