@@ -24,7 +24,7 @@
  */
 
 --------------------------------------------------------------------
--- DROP and CREATE
+-- DROP and CREATE EXTERNAL SCHEMA
 --------------------------------------------------------------------
 
 DROP SCHEMA IF EXISTS <%= externalSchema %> CASCADE;
@@ -449,7 +449,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.requests(
   remote_ip VARCHAR,
   interaction_micros BIGINT,
   web_application_controller VARCHAR,
-  web_applicaiton_action VARCHAR,
+  web_application_action VARCHAR,
   web_application_context_type VARCHAR,
   web_application_context_id VARCHAR,
   real_user_id BIGINT,
@@ -462,6 +462,76 @@ ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= s3RequestsTermLocation %>/requests';
+
+-- historical requests in gzip format
+CREATE EXTERNAL TABLE <%= externalSchema %>.historical_requests(
+  id VARCHAR,
+  timestamp TIMESTAMP,
+  timestamp_year VARCHAR,
+  timestamp_month VARCHAR,
+  timestamp_day VARCHAR,
+  user_id BIGINT,
+  course_id BIGINT,
+  root_account_id BIGINT,
+  course_account_id BIGINT,
+  quiz_id BIGINT,
+  discussion_id BIGINT,
+  conversation_id BIGINT,
+  assignment_id BIGINT,
+  url VARCHAR,
+  user_agent VARCHAR,
+  http_method VARCHAR,
+  remote_ip VARCHAR,
+  interaction_micros BIGINT,
+  web_application_controller VARCHAR,
+  web_application_action VARCHAR,
+  web_application_context_type VARCHAR,
+  web_application_context_id VARCHAR,
+  real_user_id BIGINT,
+  session_id VARCHAR,
+  user_agent_id BIGINT,
+  http_status VARCHAR,
+  http_version VARCHAR
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3RequestsHistoricalLocation %>/requests';
+
+-- historical requests in parquet compression format
+CREATE EXTERNAL TABLE <%= externalSchema %>.historical_requests_parquet(
+  id VARCHAR,
+  timestamp TIMESTAMP,
+  timestamp_year VARCHAR,
+  timestamp_month VARCHAR,
+  timestamp_day VARCHAR,
+  user_id BIGINT,
+  course_id BIGINT,
+  root_account_id BIGINT,
+  course_account_id BIGINT,
+  quiz_id BIGINT,
+  discussion_id BIGINT,
+  conversation_id BIGINT,
+  assignment_id BIGINT,
+  url VARCHAR,
+  user_agent VARCHAR,
+  http_method VARCHAR,
+  remote_ip VARCHAR,
+  interaction_micros BIGINT,
+  web_application_controller VARCHAR,
+  web_application_action VARCHAR,
+  web_application_context_type VARCHAR,
+  web_application_context_id VARCHAR,
+  real_user_id BIGINT,
+  session_id VARCHAR,
+  user_agent_id BIGINT,
+  http_status VARCHAR,
+  http_version VARCHAR
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3RequestsHistoricalLocation %>/requests-parquet-snappy';
 
 --------------------------------------------------------------------
 -- (Pseudo) Materialized Views
