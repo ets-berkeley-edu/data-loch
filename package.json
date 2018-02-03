@@ -31,11 +31,12 @@
     "node-redshift": "0.1.5",
     "request": "2.81.0",
     "run-sequence": "2.2.0",
+    "s3-list-all-objects": "0.1.0",
     "s3-upload-stream": "1.0.7",
     "yargs": "8.0.2"
   },
   "engines": {
-    "node": "6.10"
+    "node": "6.11.5"
   },
   "scripts": {
     "pretest": "echo 'Clean up old artifacts before running tests'; rm -f logs/test.log",
