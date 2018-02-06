@@ -1,11 +1,10 @@
-# Data Loch AWS deployment recipe
+# Data Loch
 
-Data Loch is an application that runs scheduled scripts to sync latest canvas data dumps (recovered from Canvas Data API) and refreshes cnavas table housed institutional data lake. The application uses AWS services like S3, Elastic Beanstalk and Redshift that are assembled together to create a highly available
-platform for running institutional analytics.
+Data Loch is an application that runs scheduled scripts to sync latest canvas data dumps (recovered from Canvas Data API) and refreshes Canvas tables housed in the institutional data lake. The application uses AWS services like S3, Elastic Beanstalk and Redshift Spectrum that are assembled together to create a highly available platform for running institutional analytics.
 
-# Elastic Beanstalk deployment
+# AWS deployment recipe
 
-## 1. Pre-deployment set up
+## 1. AWS cli & eb cli setup
   ### Install aws cli and eb cli.
 
   ```
@@ -42,10 +41,25 @@ platform for running institutional analytics.
     $ export PATH=~/Library/Python/2.7/bin:$PATH
   ```
 
-  For more detais on install eb refer:
+  For more details on install eb refer:
   http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html
 
-## 2. Deploying your application to Elastic Beanstalk via eb cli
+## 2. Pre-deployment set up
+
+  ### Steps
+  1. Create dedicated S3 buckets.
+  2. Enable transfer acceleration.
+  3. Enable encryption using KMS keys.
+  4. Set up Lifecycle rules to retain only last 15 days of data in the the bucket/canvas-data/daily/*
+  5. Set up a single node Redshift cluster with firewalls
+  6. Create a Redshift Spectrum role and provide necessary permissions to S3 bucket
+
+  For more details on Redshift Spectrum set up refer the link below
+  https://docs.aws.amazon.com/redshift/latest/dg/c-getting-started-using-spectrum.html
+
+# Elastic Beanstalk setup
+
+## Deploying your application to Elastic Beanstalk via eb cli
 
   1. Open the terminal and clone the data-loch code form ets-berkeley-edu github.
 
@@ -88,10 +102,9 @@ platform for running institutional analytics.
       2) canvas-data-processor
       3) boac
       4) lrs-privacy-dashboard
-      5) cloud-lrs-aws-raytest
-      6) cloud-lrs
-      7) [ Create new Application ]
-      (default is 3): 3
+      5) cloud-lrs
+      6) [ Create new Application ]
+      (default is 5): 6
 
       Note: Elastic Beanstalk now supports AWS CodeCommit; a fully-managed source control service. To learn more, see Docs: https://aws.amazon.com/codecommit/
       Do you wish to continue with CodeCommit? (y/N) (default is n): n
@@ -138,7 +151,7 @@ platform for running institutional analytics.
       $ eb create data-loch-master-dev --elb-type application --instance_type t2.micro --envvars EB_ENVIRONMENT=data-loch-master-dev
   ```
 
-  6. The .ebextension folder contains all the custom configurations required to run the lrs-sqs-poller application on the environment.
+  6. The .ebextension folder contains all the custom configurations required to run the data-loch application on the environment.
 
   7. This should deploy the data-loch application to Elastic Beanstalk. Check the status using the following command
 
