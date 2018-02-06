@@ -33,7 +33,22 @@ node app
 
 ## Run
 
-Refresh the DataLake views. The views give fast access to enrollment and assignment data.
+Refresh the DataLake views. These high-performance materialized views give applications access to analytics data.
 
-1. Configure the cron-like job. The `dataLake.cronJob.cronTime` config must have a [valid cron pattern](http://crontab.org).
+1. Configure the cron-like job and the script to run. The `dataLake.cron.tasks` configs must have a [valid cron pattern](http://crontab.org) and the path to the cron script to run on trigger.
+```
+"cron": {
+    "enabled": true,
+    "tasks": {
+      "syncDumps" : {
+        "interval": "00 00 5 * * 1-5",  // Runs every weekday at 5 AM
+        "script": "../store/syncDumps",
+        "runOnInit": false
+      }
+    }
+```
 2. When the app starts it also configures and schedules cron tasks
+3. Alternatively, the cron scripts can also be trigger externally via a REST API for ad-hoc runs.
+
+## Cloud deployment notes
+Refer [AWS deployment docs](docs/aws-deployment.md)
