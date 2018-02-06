@@ -35,10 +35,13 @@ DataLoch.init(function(err) {
 
   log.info('Data Loch Server has started. Brace yourself for awesomeness');
 
-  cron.start(function(callback) {
+  cron.start(function(err) {
+    if (err) {
+      log.error({err: err}, 'We might have an invalid cron configuration.');
+    }
+
     log.info('Cron started.');
-
     return;
-  });
 
+  });
 });
