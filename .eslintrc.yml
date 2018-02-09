@@ -170,7 +170,7 @@ rules:
   no-throw-literal: 2
   no-trailing-spaces: 2
   no-undef-init: 2
-  no-undefined: 2
+  no-undefined: 1
   no-underscore-dangle: 2
   no-unneeded-ternary: 2
   no-unreachable: 2

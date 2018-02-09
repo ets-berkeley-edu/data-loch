@@ -37,8 +37,12 @@ config/*.json
 sql/*
 sql/dbCreation.sql
 sql/dbRepoint.sql
+scripts/suitec-analytics/lib/sql/*
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Package lock files
+package-lock.json
