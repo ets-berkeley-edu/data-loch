@@ -37,7 +37,21 @@ CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.mixpanel_events (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
-LOCATION '<%= suitecS3MixpanelLocation %>/mixpanel-events';
+LOCATION '<%= suitecS3MixpanelLocation %>';
+
+--
+-- SuiteC dictionary to extract targetted data for researchers
+--
+CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.data_access_dict (
+  id integer,
+  canvas_course_id integer,
+  research_group varchar
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '<%= suitecDictionaryLocation %>';
 
 --
 -- PostgreSQL database dump
@@ -52,7 +66,7 @@ CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.activities (
   type varchar,
   object_id integer,
   object_type varchar,
-  metadata varchar,
+  metadata varchar(20000),
   created_at varchar,
   updated_at varchar,
   asset_id integer,
@@ -109,7 +123,7 @@ LOCATION '<%= suitecS3Location %>/asset_users';
 
 CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.asset_whiteboard_elements (
   uid varchar,
-  element varchar(20000),
+  element varchar(50000),
   created_at varchar,
   updated_at varchar,
   asset_id integer,
@@ -131,7 +145,7 @@ CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.assets (
   download_url varchar(255),
   title varchar(255),
   canvas_assignment_id integer,
-  description varchar,
+  description varchar(2000),
   preview_status varchar(255),
   thumbnail_url varchar(255),
   image_url varchar(255),
@@ -201,7 +215,7 @@ LOCATION '<%= suitecS3Location %>/canvas';
 
 CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.categories (
   id integer,
-  title varchar(255),
+  title varchar(500),
   canvas_assignment_id integer,
   canvas_assignment_name varchar(255),
   created_at varchar,
@@ -221,7 +235,7 @@ LOCATION '<%= suitecS3Location %>/categories';
 
 CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.chats (
   id integer,
-  body varchar,
+  body varchar(5000),
   created_at varchar,
   updated_at varchar,
   whiteboard_id integer,
@@ -238,7 +252,7 @@ LOCATION '<%= suitecS3Location %>/chats';
 
 CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.comments (
   id integer,
-  body varchar,
+  body varchar(20000),
   created_at varchar,
   updated_at varchar,
   asset_id integer,
@@ -326,7 +340,7 @@ LOCATION '<%= suitecS3Location %>/users';
 
 CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.whiteboard_elements (
   uid integer,
-  element varchar,
+  element varchar(50000),
   created_at varchar,
   updated_at varchar,
   whiteboard_id integer,

@@ -52,7 +52,8 @@ var generateSqlScript = function(templateFile, outputFile, callback) {
       suitecAnalyticsSchema: config.get('datalake.suitec.analyticsSchema'),
       suitecS3Location: 's3://' + config.get('datalake.s3.bucket') + '/' + config.get('datalake.suitec.directory.suitec'),
       suitecS3MixpanelLocation: 's3://' + config.get('datalake.s3.bucket') + '/' + config.get('datalake.suitec.directory.mixpanelEvents'),
-      iamRole: config.get('datalake.redshift.iamRole')
+      iamRole: config.get('datalake.redshift.iamRole'),
+      suitecDictionaryLocation: 's3://' + config.get('datalake.s3.bucket') + '/suiteC/dictionary'
     };
     var templateOutput = _.template(template)(templateData);
 
@@ -87,6 +88,7 @@ var createSqlTemplates = function(callback) {
       return callback(err);
     }
 
+    // var suitecProcessTemplate = path.join(__dirname, '/db-templates/process.template.sql');
     var suitecProcessTemplate = path.join(__dirname, '/db-templates/process.template.sql');
     var suitecProcessScript = path.join(__dirname, '/sql/suitecProcess.sql');
 
@@ -168,6 +170,14 @@ var loadSchema = module.exports.loadSchema = function(callback) {
   });
 };
 
-// loadSchema(function() { });
+loadSchema(function(err) {
+  if(err) {
+    process.exit(1);
+  }
 
-generateAnalyticsTables(function() {});
+  generateAnalyticsTables(function(err) {
+    if(err) {
+      process.exit(1);
+    }
+  });
+});

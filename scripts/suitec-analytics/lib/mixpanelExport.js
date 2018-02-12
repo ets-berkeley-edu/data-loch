@@ -87,12 +87,10 @@ var uploadMixpanelEventsToS3 = module.exports.uploadMixpanelEventsToS3 = functio
   var base_url = 'http://data.mixpanel.com/api/2.0/export/?';
   var request = base_url + params.join('&') + '&sig=' + signature;
 
+  log.info('Request: ' + request);
+
   // make get request to Mixpanel API
-  var req = http.get(request, function(err, response) {
-    if (err) {
-      log.error('Got error: ' + err.message);
-      return callback(err);
-    }
+  var req = http.get(request, function(response) {
 
     log.info('Streaming mixpanel events from export api to S3 data loch location. This may take a while.');
     // Multi part streming to s3
@@ -105,6 +103,8 @@ var uploadMixpanelEventsToS3 = module.exports.uploadMixpanelEventsToS3 = functio
         log.info('Finished Canvas data file upload');
         return callback();
       });
+  }).on("error", function(e) {
+    console.log("Got error: " + e.message);
   });
 };
 
