@@ -228,6 +228,113 @@ FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/assignment_dim';
 
+-- assignment_override_fact
+CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_override_fact(
+  assignment_override_id BIGINT,
+  account_id BIGINT,
+  assignment_id BIGINT,
+  assignment_group_id BIGINT,
+  course_id BIGINT,
+  course_section_id BIGINT,
+  enrollment_term_id BIGINT,
+  group_id BIGINT,
+  group_category_id BIGINT,
+  group_parent_account_id BIGINT,
+  nonxlist_course_id BIGINT,
+  quiz_id BIGINT,
+  group_wiki_id BIGINT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/assignment_override_fact';
+
+-- assignment_override_dim
+CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_override_dim(
+  id BIGINT,
+  canvas_id BIGINT,
+  assignment_id BIGINT,
+  course_section_id BIGINT,
+  group_id BIGINT,
+  quiz_id BIGINT,
+  all_day VARCHAR,
+  all_day_date TIMESTAMP,
+  assignment_version INT,
+  created_at TIMESTAMP,
+  due_at TIMESTAMP,
+  due_at_overridden VARCHAR,
+  lock_at TIMESTAMP,
+  lock_at_overridden VARCHAR,
+  set_type VARCHAR,
+  title VARCHAR,
+  unlock_at TIMESTAMP,
+  unlock_at_overridden VARCHAR,
+  updated_at TIMESTAMP,
+  quiz_version INT,
+  workflow_state VARCHAR
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/assignment_override_dim';
+
+-- assignment_override_user_fact
+CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_override_user_fact(
+  assignment_override_user_id BIGINT,
+  account_id BIGINT,
+  assignment_group_id BIGINT,
+  assignment_id BIGINT,
+  assignment_override_id BIGINT,
+  course_id BIGINT,
+  enrollment_term_id BIGINT,
+  quiz_id BIGINT,
+  user_id BIGINT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/assignment_override_user_fact';
+
+-- assignment_override_user_dim
+CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_override_user_dim(
+  id BIGINT,
+  canvas_id BIGINT,
+  assignment_id BIGINT,
+  assignment_override_id BIGINT,
+  quiz_id BIGINT,
+  user_id BIGINT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/assignment_override_user_dim';
+
+-- assignment_override_user_rollup_fact
+CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_override_user_rollup_fact(
+  assignment_id BIGINT,
+  assignment_override_id BIGINT,
+  assignment_override_user_adhoc_id BIGINT,
+  assignment_group_id BIGINT,
+  course_id BIGINT,
+  course_account_id BIGINT,
+  course_section_id BIGINT,
+  enrollment_id BIGINT,
+  enrollment_term_id BIGINT,
+  group_category_id BIGINT,
+  group_id BIGINT,
+  group_parent_account_id BIGINT,
+  group_wiki_id BIGINT,
+  nonxlist_course_id BIGINT,
+  quiz_id BIGINT,
+  user_id BIGINT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/assignment_override_user_rollup_fact';
+
 -- discussion_entry_dim
 CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_entry_dim(
   id BIGINT,
