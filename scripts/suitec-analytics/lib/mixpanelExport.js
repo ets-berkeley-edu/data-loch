@@ -103,8 +103,8 @@ var uploadMixpanelEventsToS3 = module.exports.uploadMixpanelEventsToS3 = functio
         log.info('Finished Canvas data file upload');
         return callback();
       });
-  }).on("error", function(e) {
-    console.log("Got error: " + e.message);
+  }).on('error', function(err) {
+    log.error('Got error: ' + err.message);
   });
 };
 

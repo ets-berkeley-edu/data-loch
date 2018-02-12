@@ -158,26 +158,33 @@ var loadSchema = module.exports.loadSchema = function(callback) {
       createDatabase(function(err) {
         if (err) {
           log.error({err: err.message}, 'Suitec and Mixpanel data restore on Redshift instance failed');
-
           return callback(err);
+
         }
 
-        log.info('SuiteC and Mixpanel data has been created on Redshift.');
-
+        log.info('SuiteC and Mixpanel database has been restored on data loch successfully.');
         return callback();
       });
     });
   });
 };
 
+/**
+ *
+ *
+ * @param  {Function}         callback                Standard callback function
+ * @param  {Object}           callback.err            An error object, if any
+ */
 loadSchema(function(err) {
-  if(err) {
-    process.exit(1);
+  if (err) {
+    log.error('Completed with errors.');
   }
 
   generateAnalyticsTables(function(err) {
-    if(err) {
-      process.exit(1);
+    if (err) {
+      log.error('Completed with errors.');
     }
+
+    log.info('All done.');
   });
 });

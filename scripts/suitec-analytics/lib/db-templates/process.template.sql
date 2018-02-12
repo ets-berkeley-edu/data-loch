@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.asset_comments;
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.whiteboards;
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.whiteboard_members;
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.whiteboard_chats;
+DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.suitec_users;
 
 CREATE TABLE <%= suitecAnalyticsSchema %>.data_access_dict AS (
   SELECT
@@ -459,3 +460,19 @@ CREATE TABLE <%= suitecAnalyticsSchema %>.whiteboard_chats AS (
   		INNER JOIN q1
   			ON q3.user_id = q1.user_id
  );
+
+-- cleaned up users table
+CREATE TABLE AS <%= suitecAnalyticsSchema %>.suitec_users (
+	SELECT
+  		hashed_user_id,
+  		canvas_course_role,
+  		canvas_enrollment_state,
+  		points,
+  		share_points::integer,
+  		created_at,
+  		updated_at,
+  		suitec_course_id,
+  		canvas_course_id,
+  		canvas_course_name
+	FROM <%= suitecAnalyticsSchema %>.user_enrollments
+);
