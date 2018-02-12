@@ -57,6 +57,26 @@ ALTER TABLE <%= externalSchema %>.assignment_fact
 ALTER TABLE <%= externalSchema %>.assignment_dim
   SET LOCATION '<%= s3DailyLocation %>/assignment_dim';
 
+-- Assignment override fact
+ALTER TABLE <%= externalSchema %>.assignment_override_fact
+  SET LOCATION '<%= s3DailyLocation %>/assignment_override_fact';
+
+-- Assignment override dim
+ALTER TABLE <%= externalSchema %>.assignment_override_dim
+  SET LOCATION '<%= s3DailyLocation %>/assignment_override_dim';
+
+-- Assignment override user fact
+ALTER TABLE <%= externalSchema %>.assignment_override_user_fact
+  SET LOCATION '<%= s3DailyLocation %>/assignment_override_user_fact';
+
+-- Assignment override user dim
+ALTER TABLE <%= externalSchema %>.assignment_override_user_dim
+  SET LOCATION '<%= s3DailyLocation %>/assignment_override_user_dim';
+
+-- Assignment override user rollup fact
+ALTER TABLE <%= externalSchema %>.assignment_override_user_rollup_fact
+  SET LOCATION '<%= s3DailyLocation %>/assignment_override_user_rollup_fact';
+
 -- Discussion Entry dimension
 ALTER TABLE  <%= externalSchema %>.discussion_entry_dim
   SET LOCATION '<%= s3DailyLocation %>/discussion_entry_dim';
