@@ -45,7 +45,8 @@ var prepareUnloadData = module.exports.prepareUnloadData = function(schemaName, 
       return callback(err);
     }
 
-    var exportLocation = 's3://ets-sandeep-test/suiteC/export/' + tableName;
+    var researchGroupRequestingData = config.get('datalake.suitec.researchGroupRequestingData');
+    var exportLocation = 's3://ets-sandeep-test/suiteC/export/' + researchGroupRequestingData + '/' + tableName;
     var credentials = 'aws_access_key_id=' + config.get('aws.credentials.accessKeyId') +
      ';aws_secret_access_key=' + config.get('aws.credentials.secretAccessKey');
 
@@ -63,13 +64,9 @@ var prepareUnloadData = module.exports.prepareUnloadData = function(schemaName, 
 
     var unloadQuery = 'UNLOAD (\'' + selectQuery + '\') ' +
      'TO \'' + exportLocation + '\' credentials \'' + credentials +
-     '\' DELIMITER AS \'\t\' ESCAPE ADDQUOTES NULL AS \'\' ALLOWOVERWRITE \
+     '\' DELIMITER AS \'\t\' ESCAPE GZIP NULL AS \'\' ALLOWOVERWRITE \
      PARALLEL OFF ';
 
-    // log.info(columns);
-    // log.info(castedColumns);
-    // log.info(selectQuery);
-    // log.info('\n' + unloadQuery);
     return callback(null, unloadQuery);
 
   });

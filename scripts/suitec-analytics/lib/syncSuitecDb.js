@@ -53,7 +53,8 @@ var generateSqlScript = function(templateFile, outputFile, callback) {
       suitecS3Location: 's3://' + config.get('datalake.s3.bucket') + '/' + config.get('datalake.suitec.directory.suitec'),
       suitecS3MixpanelLocation: 's3://' + config.get('datalake.s3.bucket') + '/' + config.get('datalake.suitec.directory.mixpanelEvents'),
       iamRole: config.get('datalake.redshift.iamRole'),
-      suitecDictionaryLocation: 's3://' + config.get('datalake.s3.bucket') + '/suiteC/dictionary'
+      suitecDictionaryLocation: 's3://' + config.get('datalake.s3.bucket') + '/suiteC/dictionary',
+      researchGroupRequestingData: config.get('datalake.suitec.researchGroupRequestingData')
     };
     var templateOutput = _.template(template)(templateData);
 
@@ -131,6 +132,7 @@ var createDatabase = function(callback) {
  * @param  {Object}           callback.err            An error object, if any
  */
 var generateAnalyticsTables = function(callback) {
+  log.info('Run analytic pipelines... this might take a while.');
   db.runSQLScript(path.join(__dirname, 'sql/suitecProcess.sql'), function(err) {
     if (err) {
       log.error({err: err}, 'Failed to create database');
