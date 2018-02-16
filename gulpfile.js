@@ -35,7 +35,7 @@ gulp.task('eslint', function() {
     .src([
       'gulpfile.js',
       'lib/**/*.js',
-      'scripts/*.js',
+      'scripts/**/*.js',
       'test/*.js'
     ])
     .pipe(eslint())

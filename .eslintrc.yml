@@ -133,7 +133,7 @@ rules:
     - false
   no-mixed-spaces-and-tabs: 2
   no-multi-spaces: 2
-  no-multi-str: 2
+  no-multi-str: 0
   no-multiple-empty-lines:
     - 2
     - max: 1
@@ -170,7 +170,7 @@ rules:
   no-throw-literal: 2
   no-trailing-spaces: 2
   no-undef-init: 2
-  no-undefined: 2
+  no-undefined: 1
   no-underscore-dangle: 2
   no-unneeded-ternary: 2
   no-unreachable: 2

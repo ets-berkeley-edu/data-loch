@@ -32,6 +32,24 @@
       "iamRole": "iam role",
       "requestsTermRegExp": "regexp for requests file url parsing"
     },
+    "suitec": {
+      "mixpanel": {
+        "key": "mixpanel key",
+        "secret": "mixpanel secret",
+        "exportParams": {
+          "from_date": "start date Eg: 2015-01-10",
+          "to_date": "end date"
+        }
+      },
+      "directory": {
+        "mixpanelEvents": "path/to/mixpanel/events",
+        "suitec": "path/to/suitec/data"
+      },
+      "externalSchema": "schema_name",
+      "analyticsSchema": "analytics_schema_name",
+      "stagingSchema": "staging_schema_name",
+      "researchGroupRequestingData": "research group name requesting data exteracts"
+    },
     "cron": {
         "enabled": false,
         "tasks": {
