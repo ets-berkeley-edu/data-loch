@@ -52,6 +52,11 @@
     },
     "cron": {
         "enabled": false,
+        "tasksToschedule": [
+          "syncDumps",
+          "syncDb",
+          "boacAnalytics"
+         ],
         "tasks": {
           "syncDumps" : {
             "interval": "0 0 0/1 * * *",
@@ -59,7 +64,12 @@
             "runOnInit": false
           },
           "syncDb" : {
-            "interval": "0 0 0/1 * * *",
+            "interval": "0 0 1/1 * * *",
+            "script": "path/to/script",
+            "runOnInit": false
+          },
+          "boacAnalytics" : {
+            "interval": "0 0 2/1 * * *",
             "script": "path/to/script",
             "runOnInit": false
           }
