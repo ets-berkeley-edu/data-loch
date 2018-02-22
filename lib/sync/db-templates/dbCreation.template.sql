@@ -639,27 +639,3 @@ ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= s3RequestsHistoricalLocation %>/requests-parquet-snappy';
-
---------------------------------------------------------------------
--- (Pseudo) Materialized Views
---------------------------------------------------------------------
-
--- View used by BOAC
--- DROP SCHEMA <%= boacSchema %> CASCADE;
-
-CREATE SCHEMA IF NOT EXISTS <%= boacSchema %>;
-
-DROP TABLE IF EXISTS <%= boacSchema %>.berkeley_enrollments_view;
-CREATE TABLE IF NOT EXISTS <%= boacSchema %>.berkeley_enrollments_view(
-    year INTEGER NOT NULL,
-    term VARCHAR(8) NOT NULL,
-    canvas_course_id INTEGER NOT NULL,
-    canvas_user_id INTEGER NOT NULL,
-    course_name VARCHAR(255) NOT NULL,
-    course_code VARCHAR(255),
-    user_uid INTEGER NOT NULL,
-    sis_user_id INTEGER,
-    user_full_name VARCHAR(255) NOT NULL,
-    canvas_page_views INTEGER,
-    primary key(canvas_course_id, canvas_user_id)
-);

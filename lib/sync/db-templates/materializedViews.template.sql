@@ -1,33 +1,33 @@
 /**
-* Copyright ©2018. The Regents of the University of California (Regents). All Rights Reserved.
-*
-* Permission to use, copy, modify, and distribute this software and its documentation
-* for educational, research, and not-for-profit purposes, without fee and without a
-* signed licensing agreement, is hereby granted, provided that the above copyright
-* notice, this paragraph and the following two paragraphs appear in all copies,
-* modifications, and distributions.
-*
-* Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck Avenue,
-* Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, otl@berkeley.edu,
-* http://ipira.berkeley.edu/industry-info for commercial licensing opportunities.
-*
-* IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
-* INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
-* THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS HAS BEEN ADVISED
-* OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-* SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED HEREUNDER IS PROVIDED
-* "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
-* ENHANCEMENTS, OR MODIFICATIONS.
-*/
+ * Copyright ©2018. The Regents of the University of California (Regents). All Rights Reserved.
+ *
+ * Permission to use, copy, modify, and distribute this software and its documentation
+ * for educational, research, and not-for-profit purposes, without fee and without a
+ * signed licensing agreement, is hereby granted, provided that the above copyright
+ * notice, this paragraph and the following two paragraphs appear in all copies,
+ * modifications, and distributions.
+ *
+ * Contact The Office of Technology Licensing, UC Berkeley, 2150 Shattuck Avenue,
+ * Suite 510, Berkeley, CA 94720-1620, (510) 643-7201, otl@berkeley.edu,
+ * http://ipira.berkeley.edu/industry-info for commercial licensing opportunities.
+ *
+ * IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+ * INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF
+ * THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS HAS BEEN ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ * SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED HEREUNDER IS PROVIDED
+ * "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
+ * ENHANCEMENTS, OR MODIFICATIONS.
+ */
 
-CREATE SCHEMA IF NOT EXISTS < % = boacAnalyticsSchema % >;
+CREATE SCHEMA IF NOT EXISTS <%= boacAnalyticsSchema %>;
 
-DROP TABLE IF EXISTS < % = boacAnalyticsSchema % >.page_views_zscore;
+DROP TABLE IF EXISTS <%= boacAnalyticsSchema %>.page_views_zscore;
 
-CREATE TABLE < % = boacAnalyticsSchema % >.page_views_zscore
+CREATE TABLE <%= boacAnalyticsSchema %>.page_views_zscore
 AS (
 WITH
     /*
@@ -44,7 +44,7 @@ WITH
             type,
             count(*)
         FROM
-            < % = externalSchema % >.enrollment_dim
+            <%= externalSchema %>.enrollment_dim
         WHERE
             workflow_state IN ('active', 'completed')
             AND type = 'StudentEnrollment'
@@ -87,7 +87,7 @@ WITH
                 r.http_version,
                 e1.type AS enrollment_type
             FROM
-                < % = externalSchema % >.requests r
+                <%= externalSchema %>.requests r
             INNER JOIN e1 ON r.user_id = e1.user_id
                 AND r.course_id = e1.course_id
             WHERE
@@ -135,8 +135,11 @@ WITH
                             w1
                             JOIN w2 ON w1.course_id = w2.course_id
                         WHERE
-                            w2.stddev_course_page_views > 0.00), w4 AS (
-                            -- page_views_zscore calculation query, where nulls/divide by zero errors are handled
+                            w2.stddev_course_page_views > 0.00),
+                        /*
+                         * page_views_zscore calculation query, where nulls/divide by zero errors are handled
+                         */
+                        w4 AS (
                             SELECT
                                 w1.course_id AS course_id, w1.user_id AS user_id, w1.user_page_views, w2.avg_course_page_views, w2.stddev_course_page_views, COALESCE(w3.user_page_view_zscore, 0) AS user_page_view_zscore
                             FROM
@@ -167,8 +170,8 @@ WITH
                             p.unique_name,
                             p.workflow_state as active_state
                         FROM
-                            < % = externalSchema % >.user_dim u
-                        LEFT JOIN < % = externalSchema % >.pseudonym_dim p ON u.id = p.user_id
+                            <%= externalSchema %>.user_dim u
+                        LEFT JOIN <%= externalSchema %>.pseudonym_dim p ON u.id = p.user_id
                     WHERE
                         p.workflow_state = 'active')
                     /*
@@ -181,4 +184,4 @@ WITH
                     FROM
                         w4
                     LEFT JOIN w5 ON w4.user_id = w5.global_user_id
-                LEFT JOIN < % = externalSchema % >.course_dim c ON w4.course_id = c.id);
+                LEFT JOIN <%= externalSchema %>.course_dim c ON w4.course_id = c.id);
