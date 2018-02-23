@@ -53,7 +53,7 @@ WITH
             course_id,
             type),
         /*
-         * Filter requests where user role in enrollment is facutly
+         * Filter out requests which were unlikely to correspond to a single student page view.
          * TODO: Add page_view and participation dictionary tables to further filter requests
          */
         w0 AS (
@@ -93,6 +93,11 @@ WITH
             WHERE
                 r.user_id is not null
                 AND r.course_id is not null),
+                AND r.url LIKE '/courses/%'
+                AND r.url NOT LIKE '/courses/%/files/%module_item_id%'
+                AND r.url NOT LIKE '/courses/%/files/%/inline_view'
+                AND r.url NOT LIKE '/courses/%/modules/items/assignment_info'
+                AND r.url NOT LIKE '/courses/%/modules/progressions'
             /*
              * Calculates activity frequency for a user on a course level
              */
