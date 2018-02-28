@@ -92,12 +92,12 @@ WITH
                 AND r.course_id = e1.course_id
             WHERE
                 r.user_id is not null
-                AND r.course_id is not null),
+                AND r.course_id is not null
                 AND r.url LIKE '/courses/%'
                 AND r.url NOT LIKE '/courses/%/files/%module_item_id%'
                 AND r.url NOT LIKE '/courses/%/files/%/inline_view'
                 AND r.url NOT LIKE '/courses/%/modules/items/assignment_info'
-                AND r.url NOT LIKE '/courses/%/modules/progressions'
+                AND r.url NOT LIKE '/courses/%/modules/progressions'),
             /*
              * Calculates activity frequency for a user on a course level
              */
