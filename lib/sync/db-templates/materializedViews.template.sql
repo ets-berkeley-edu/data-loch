@@ -176,7 +176,7 @@ WITH
             u.workflow_state,
             u.sortable_name,
             p.user_id AS pseudo_user_id,
-            p.canvas_id as psedo_canvas_id,
+            p.canvas_id as pseudo_canvas_id,
             p.sis_user_id,
             p.unique_name,
             p.workflow_state as active_state
