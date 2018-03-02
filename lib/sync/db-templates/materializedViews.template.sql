@@ -59,41 +59,14 @@ WITH
      */
     w0 AS (
         SELECT
-            r.id,
-            r.timestamp,
-            r.timestamp_year,
-            r.timestamp_month,
-            r.timestamp_day,
-            r.user_id,
-            r.course_id,
-            r.root_account_id,
-            r.course_account_id,
-            r.quiz_id,
-            r.discussion_id,
-            r.conversation_id,
-            r.assignment_id,
+            e1.user_id,
+            e1.course_id,
             r.url,
-            r.user_agent,
-            r.http_method,
-            r.remote_ip,
-            r.interaction_micros,
-            r.web_application_controller,
-            r.web_application_action,
-            r.web_application_context_type,
-            r.web_application_context_id,
-            r.real_user_id,
-            r.session_id,
-            r.user_agent_id,
-            r.http_status,
-            r.http_version,
             e1.type AS enrollment_type
         FROM
-            <%= externalSchema %>.requests r
-        INNER JOIN e1 ON r.user_id = e1.user_id
+            e1
+        LEFT OUTER JOIN <%= externalSchema %>.requests r ON r.user_id = e1.user_id
             AND r.course_id = e1.course_id
-        WHERE
-            r.user_id is not null
-            AND r.course_id is not null
             AND r.url LIKE '/courses/%'
             AND r.url NOT LIKE '/courses/%/files/%module_item_id%'
             AND r.url NOT LIKE '/courses/%/files/%/inline_view'
