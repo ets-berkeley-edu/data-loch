@@ -635,7 +635,5 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.historical_requests_parquet(
     http_status VARCHAR,
     http_version VARCHAR
 )
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY '\t'
-STORED AS TEXTFILE
+STORED AS PARQUET
 LOCATION '<%= s3RequestsHistoricalLocation %>/requests-parquet-snappy';
