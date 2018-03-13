@@ -77,6 +77,10 @@ ALTER TABLE <%= externalSchema %>.assignment_override_user_dim
 ALTER TABLE <%= externalSchema %>.assignment_override_user_rollup_fact
   SET LOCATION '<%= s3DailyLocation %>/assignment_override_user_rollup_fact';
 
+-- Course score fact
+ALTER TABLE <%= externalSchema %>.course_score_fact
+      SET LOCATION '<%= s3DailyLocation %>/course_score_fact';
+
 -- Discussion Entry dimension
 ALTER TABLE      <%= externalSchema %>.discussion_entry_dim
       SET LOCATION '<%= s3DailyLocation %>/discussion_entry_dim';

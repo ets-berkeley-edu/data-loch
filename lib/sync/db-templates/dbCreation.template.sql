@@ -335,6 +335,23 @@ FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/assignment_override_user_rollup_fact';
 
+-- course_score_fact
+CREATE EXTERNAL TABLE <%= externalSchema %>.course_score_fact(
+    score_id BIGINT,
+    canvas_id BIGINT,
+    account_id BIGINT,
+    course_id BIGINT,
+    enrollment_id BIGINT,
+    current_score DOUBLE PRECISION,
+    final_score DOUBLE PRECISION,
+    muted_current_score DOUBLE PRECISION,
+    muted_final_score DOUBLE PRECISION
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/course_score_fact';
+
 -- discussion_entry_dim
 CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_entry_dim(
     id BIGINT,

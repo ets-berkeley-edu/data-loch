@@ -274,3 +274,28 @@ AS (
             AND most_lenient_override.assignment_id = <%= externalSchema %>.submission_fact.assignment_id
     WHERE <%= externalSchema %>.assignment_dim.workflow_state = 'published'
 );
+
+DROP TABLE IF EXISTS <%= boacAnalyticsSchema %>.user_course_scores;
+
+CREATE TABLE <%= boacAnalyticsSchema %>.user_course_scores
+SORTKEY (course_id)
+AS (
+    SELECT
+        <%= externalSchema %>.user_dim.canvas_id AS user_id,
+        <%= externalSchema %>.course_dim.canvas_id AS course_id,
+        <%= externalSchema %>.course_score_fact.current_score AS current_score,
+        <%= externalSchema %>.course_score_fact.final_score AS final_score
+    FROM
+        <%= externalSchema %>.enrollment_fact
+        JOIN <%= externalSchema %>.enrollment_dim
+            ON <%= externalSchema %>.enrollment_dim.id = <%= externalSchema %>.enrollment_fact.enrollment_id
+        JOIN <%= externalSchema %>.course_score_fact
+            ON <%= externalSchema %>.course_score_fact.enrollment_id = <%= externalSchema %>.enrollment_fact.enrollment_id
+        JOIN <%= externalSchema %>.user_dim
+            ON <%= externalSchema %>.user_dim.id = <%= externalSchema %>.enrollment_fact.user_id
+        JOIN <%= externalSchema %>.course_dim
+            ON <%= externalSchema %>.course_dim.id = <%= externalSchema %>.enrollment_fact.course_id
+    WHERE
+        <%= externalSchema %>.enrollment_dim.type = 'StudentEnrollment'
+        AND <%= externalSchema %>.enrollment_dim.workflow_state = 'active'
+);
