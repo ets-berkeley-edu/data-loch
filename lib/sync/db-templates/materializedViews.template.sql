@@ -125,8 +125,8 @@ AS (
     SELECT
         <%= externalSchema %>.user_dim.canvas_id AS user_id,
         <%= externalSchema %>.course_dim.canvas_id AS course_id,
-        <%= externalSchema %>.course_score_fact.muted_current_score AS current_score,
-        <%= externalSchema %>.course_score_fact.muted_final_score AS final_score
+        <%= externalSchema %>.course_score_fact.current_score AS current_score,
+        <%= externalSchema %>.course_score_fact.final_score AS final_score
     FROM
         <%= externalSchema %>.enrollment_fact
         JOIN <%= externalSchema %>.enrollment_dim
