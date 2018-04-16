@@ -56,7 +56,8 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.user_dim (
     birthdate TIMESTAMP,
     country_code VARCHAR,
     workflow_state VARCHAR,
-    sortable_name VARCHAR
+    sortable_name VARCHAR,
+    global_canvas_id VARCHAR
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -83,7 +84,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.pseudonym_dim (
     sis_user_id VARCHAR,
     unique_name VARCHAR,
     integration_id VARCHAR,
-    authentication_provider_id	BIGINT
+    authentication_provider_id BIGINT
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -106,7 +107,8 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.course_dim (
     publicly_visible BOOLEAN,
     sis_source_id VARCHAR,
     workflow_state VARCHAR,
-    wiki_id	BIGINT
+    wiki_id	BIGINT,
+    syllabus_body VARCHAR
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -145,8 +147,8 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.enrollment_fact(
     enrollment_term_id BIGINT,
     course_account_id BIGINT,
     course_section_id BIGINT,
-    computed_final_score	DOUBLE PRECISION,
-    computed_current_score	DOUBLE PRECISION
+    computed_final_score DOUBLE PRECISION,
+    computed_current_score DOUBLE PRECISION
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -170,7 +172,8 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.enrollment_dim(
     self_enrolled BOOLEAN,
     sis_source_id VARCHAR,
     course_id BIGINT,
-    user_id	BIGINT
+    user_id	BIGINT,
+    last_activity_at TIMESTAMP
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -185,7 +188,8 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_fact(
     enrollment_term_id VARCHAR,
     points_possible TIMESTAMP,
     peer_review_count TIMESTAMP,
-    assignment_group_id BIGINT
+    assignment_group_id BIGINT,
+    external_tool_id BIGINT
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -221,7 +225,8 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.assignment_dim(
     muted BOOLEAN,
     assignment_group_id BIGINT,
     position INT,
-    visibility VARCHAR
+    visibility VARCHAR,
+    external_tool_id	BIGINT
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -406,7 +411,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_topic_dim(
     pinned BOOLEAN,
     locked BOOLEAN,
     course_id BIGINT,
-    group_id	BIGINT
+    group_id BIGINT
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -427,7 +432,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_topic_fact(
     group_id BIGINT,
     group_parent_course_id BIGINT,
     group_parent_account_id BIGINT,
-    group_parent_course_account_id	BIGINT
+    group_parent_course_account_id BIGINT
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -475,6 +480,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.submission_dim(
     processed BOOLEAN,
     process_attempts INT,
     grade_matches_current_submission BOOLEAN,
+    published_grade VARCHAR,
     graded_at TIMESTAMP,
     has_rubric_assessment BOOLEAN,
     attempt INT,
@@ -506,29 +512,12 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_fact(
     message_size_bytes INT,
     message_character_count INT,
     message_word_count INT,
-    message_line_count	INT
+    message_line_count INT
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/submission_comment_fact';
-
--- submission_comment_participant_fact
-CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_participant_fact(
-    submission_comment_participant_id BIGINT,
-    submission_comment_id BIGINT,
-    user_id BIGINT,
-    submission_id BIGINT,
-    assignment_id BIGINT,
-    course_id BIGINT,
-    enrollment_term_id BIGINT,
-    course_account_id BIGINT,
-    enrollment_rollup_id	BIGINT
-)
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY '\t'
-STORED AS TEXTFILE
-LOCATION '<%= s3DailyLocation %>/submission_comment_participant_fact';
 
 -- submission_comment_dim
 CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_dim(
@@ -545,7 +534,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.submission_comment_dim(
     updated_at TIMESTAMP,
     anonymous BOOLEAN,
     teacher_only_comment BOOLEAN,
-    hidden	BOOLEAN
+    hidden BOOLEAN
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
