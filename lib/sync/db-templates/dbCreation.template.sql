@@ -361,7 +361,7 @@ LOCATION '<%= s3DailyLocation %>/course_score_fact';
 CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_entry_dim(
     id BIGINT,
     canvas_id BIGINT,
-    message VARCHAR,
+    message VARCHAR(5000),
     workflow_state VARCHAR,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
@@ -398,7 +398,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.discussion_topic_dim(
     id BIGINT,
     canvas_id BIGINT,
     title VARCHAR,
-    message VARCHAR,
+    message VARCHAR(5000),
     type VARCHAR,
     workflow_state VARCHAR,
     last_reply_at TIMESTAMP,
@@ -643,3 +643,60 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.historical_requests_parquet(
 )
 STORED AS PARQUET
 LOCATION '<%= s3RequestsHistoricalLocation %>/requests-parquet-snappy';
+
+
+
+CREATE EXTERNAL TABLE <%= externalSchema %>.conversation_message_participant_fact (
+    conversation_message_id	BIGINT,	-- Foreign key to the message dimension for the associated message.
+    conversation_id	BIGINT,	--Foreign key to the conversation dimension for the associated conversation
+    user_id	BIGINT,	-- Foreign key to the user dimension for the associated user
+    course_id	BIGINT,	-- Foreign key to the course dimension for the associated course.
+    enrollment_term_id BIGINT, -- Foreign Key to enrollment term table
+    course_account_id	BIGINT,	-- Foreign Key to the course's account
+    group_id	BIGINT,	-- Foreign key to the group dimension for a particular group
+    account_id	BIGINT,	-- Foreign key to account_dim
+    enrollment_rollup_id	BIGINT,	-- Foreign key to the enrollment roll-up dimension table
+    message_size_bytes	INT, -- The message size in bytes.
+    message_character_count	INT, --	The message size in characters.
+    message_word_count	INT, -- The message size in words using space and common punctuation as word breaks.
+    message_line_count	INT -- The number of lines in a message.
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/conversation_message_participant_fact';
+
+
+
+CREATE EXTERNAL TABLE <%= externalSchema %>.conversation_dim (
+    id	BIGINT,	-- Unique surrogate id for the conversation.
+    canvas_id	BIGINT,	-- Original primary key for conversation in the Canvas table
+    has_attachments	BOOLEAN,	-- True if the conversation has attachments
+    has_media_objects	BOOLEAN,	-- True if the conversation has media objects
+    subject	VARCHAR(2000),	-- The subject of the conversation
+    course_id	BIGINT,	-- The course that owns this conversation
+    group_id	BIGINT,	-- The group that owns this conversation
+    account_id	BIGINT	-- The account this owns this conversation
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/conversation_dim';
+
+
+
+CREATE EXTERNAL TABLE <%= externalSchema %>.conversation_message_dim (
+    id	BIGINT,	-- Unique surrogate id for the message.
+    canvas_id	BIGINT,	-- Original ID for canvas table.
+    conversation_id	BIGINT, -- Parent conversation for this message.
+    author_id	BIGINT,	-- User id of the author of the message.
+    created_at	TIMESTAMP,	-- Date and time this message was created.
+    generated	BOOLEAN, --	This attribute is true if the system generated this message (e.g. "John was added to this conversation")
+    has_attachments	BOOLEAN,	-- True if the message has attachments.
+    has_media_objects	BOOLEAN,	-- True if the message has media objects.
+    body	VARCHAR(5000) -- The content of the message.
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= s3DailyLocation %>/conversation_message_dim';

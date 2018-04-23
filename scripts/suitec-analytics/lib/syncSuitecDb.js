@@ -48,6 +48,7 @@ var generateSqlScript = function(templateFile, outputFile, callback) {
     }
     // Generate SQL script with template and replacement args.
     var templateData = {
+      canvasExternalSchema: config.get('datalake.canvasData.externalSchema'),
       suitecExternalSchema: config.get('datalake.suitec.externalSchema'),
       suitecAnalyticsSchema: config.get('datalake.suitec.analyticsSchema'),
       suitecS3Location: 's3://' + config.get('datalake.s3.bucket') + '/' + config.get('datalake.suitec.directory.suitec'),

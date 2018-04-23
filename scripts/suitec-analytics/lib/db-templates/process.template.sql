@@ -528,3 +528,160 @@ AS (
         canvas_course_name
     FROM
         <%= suitecAnalyticsSchema %>.user_enrollments);
+
+-- Canvas Discussion Entry
+DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.canvas_discussions_entry;
+CREATE TABLE <%= suitecAnalyticsSchema %>.canvas_discussions_entry AS (
+WITH
+	q1 AS (
+  SELECT
+    canvas_course_id
+  FROM <%= suitecExternalSchema %>.data_access_dict
+  WHERE research_group LIKE '<%= researchGroupRequestingData %>'
+	),
+	q2 AS (
+  SELECT
+    id,
+    q1.canvas_course_id,
+    enrollment_term_id,
+    name,
+    code
+  FROM <%= canvasExternalSchema %>.course_dim a
+    INNER JOIN q1
+    	ON a.canvas_id = q1.canvas_course_id
+	)
+	SELECT
+  a.discussion_entry_id,
+  a.parent_discussion_entry_id,
+  md5(d.canvas_id) AS hashed_user_id,
+  q2.canvas_course_id,
+  q2.name AS canvas_course_name,
+  a.topic_id AS discussion_topic_id,
+  a.message_length,
+  b.message,
+  b.workflow_state,
+  b.created_at,
+  b.updated_at,
+  b.deleted_at,
+  b.depth
+	FROM <%= canvasExternalSchema %>.discussion_entry_fact a
+  LEFT JOIN  <%= canvasExternalSchema %>.discussion_entry_dim b
+    ON a.discussion_entry_id = b.id
+  INNER JOIN q2
+    ON a.course_id = q2.id
+  LEFT JOIN <%= canvasExternalSchema %>.user_dim d
+    ON a.user_id = d.id
+);
+
+-- Canvas Discussions topic
+DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.canvas_discussions_topic;
+CREATE TABLE <%= suitecAnalyticsSchema %>.canvas_discussions_topic AS (
+	WITH
+  q1 AS (
+    SELECT
+    	canvas_course_id
+    FROM <%= suitecExternalSchema %>.data_access_dict
+    WHERE research_group LIKE '<%= researchGroupRequestingData %>'
+  ),
+  q2 AS (
+    SELECT
+    	id,
+    	q1.canvas_course_id,
+    	enrollment_term_id,
+    	name,
+    	code
+    FROM <%= canvasExternalSchema %>.course_dim a
+    	INNER JOIN q1
+      ON a.canvas_id = q1.canvas_course_id
+  )
+  SELECT
+    a.discussion_topic_id,
+    q2.canvas_course_id,
+    q2.name AS canvas_course_name,
+    md5(d.canvas_id) AS hashed_user_id,
+    b.title,
+    a.message_length,
+    b.message,
+    b.workflow_state,
+    b.created_at,
+    b.updated_at,
+    b.posted_at,
+    b.deleted_at,
+    b.discussion_type,
+    b.pinned::int,
+    b.locked::int
+  FROM <%= canvasExternalSchema %>.discussion_topic_fact a
+    LEFT JOIN  <%= canvasExternalSchema %>.discussion_topic_dim b
+    	ON a.discussion_topic_id = b.id
+    INNER JOIN q2
+    	ON a.course_id = q2.id
+    LEFT JOIN <%= canvasExternalSchema %>.user_dim d
+    	ON a.user_id = d.id
+);
+
+-- Conversation Message Participants
+DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.canvas_conversations;
+CREATE TABLE <%= suitecAnalyticsSchema %>.canvas_conversations AS (
+WITH
+	q1 AS (
+    SELECT
+      canvas_course_id
+    FROM <%= suitecExternalSchema %>.data_access_dict
+    WHERE research_group LIKE '<%= researchGroupRequestingData %>'
+	),
+  q2 AS (
+    SELECT
+      id,
+      q1.canvas_course_id,
+      enrollment_term_id,
+      name,
+      code
+    FROM <%= canvasExternalSchema %>.course_dim a
+      INNER JOIN q1
+      	ON a.canvas_id = q1.canvas_course_id
+	),
+	q3 AS (
+    SELECT
+      a.id as conversation_message_id,
+      a.conversation_id,
+      md5(d.canvas_id) AS hashed_author_id,
+      a.created_at,
+      a.generated,
+      a.has_attachments,
+      a.has_media_objects,
+      a.body,
+      b.subject,
+      q2.canvas_course_id,
+      q2.name
+    FROM <%= canvasExternalSchema %>.conversation_message_dim a
+      LEFT JOIN <%= canvasExternalSchema %>.conversation_dim b
+      	ON a.conversation_id = b.id
+      INNER JOIN q2
+      	ON b.course_id = q2.id
+      LEFT JOIN <%= canvasExternalSchema %>.user_dim d
+      	ON a.author_id = d.id
+	)
+	SELECT
+    a.conversation_message_id,
+    a.conversation_id,
+    md5(b.canvas_id) as hashed_participant_user_id,
+    q3.canvas_course_id,
+    q3.name,
+    a.message_size_bytes,
+    q3.hashed_author_id,
+    q3.created_at,
+    q3.generated::int,
+    q3.has_attachments::int,
+    q3.has_media_objects::int,
+    q3.body,
+    q3.subject
+
+	FROM <%= canvasExternalSchema %>.conversation_message_participant_fact a
+  LEFT JOIN q3
+    ON a.conversation_id = q3.conversation_id
+    AND a.conversation_message_id = q3.conversation_message_id
+  INNER JOIN q2
+    ON a.course_id = q2.id
+  LEFT JOIN <%= canvasExternalSchema %>.user_dim b
+    ON a.user_id = b.id
+);
