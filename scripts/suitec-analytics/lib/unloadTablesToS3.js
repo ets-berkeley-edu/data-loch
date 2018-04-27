@@ -27,10 +27,11 @@ var _ = require('lodash');
 var async = require('async');
 var config = require('config');
 var fs = require('fs');
+var moment = require('moment');
 var path = require('path');
 var Redshift = require('node-redshift');
 
-var log = require('../../../lib/core/logger')('syncSuitecDb');
+var log = require('../../../lib/core/logger')('unloadTablesToS3');
 var db = require('../../../lib/sync/db.js');
 
 var prepareUnloadData = module.exports.prepareUnloadData = function(schemaName, tableName, callback) {
@@ -45,8 +46,9 @@ var prepareUnloadData = module.exports.prepareUnloadData = function(schemaName, 
       return callback(err);
     }
 
+    var date = moment().format('YYYY-MM-DD');
     var researchGroupRequestingData = config.get('datalake.suitec.researchGroupRequestingData');
-    var exportLocation = 's3://ets-sandeep-test/suiteC/export/' + researchGroupRequestingData + '/' + tableName;
+    var exportLocation = 's3://' + config.get('datalake.s3.bucket') + '/suiteC/export/' + researchGroupRequestingData + '/' + date + '/' + tableName;
     var credentials = 'aws_access_key_id=' + config.get('aws.credentials.accessKeyId') +
      ';aws_secret_access_key=' + config.get('aws.credentials.secretAccessKey');
 
@@ -82,13 +84,16 @@ var unloadToS3 = module.exports.unloadToS3 = function(callback) {
     'asset_comments',
     'asset_users',
     'courses',
+    'events',
     'ei_score_configs',
     'mixpanel_events',
-    'suitec_users',
     'user_enrollments',
     'whiteboards',
     'whiteboard_chats',
-    'whiteboard_members'
+    'whiteboard_members',
+    'canvas_discussions_entry',
+    'canvas_discussions_topic',
+    'canvas_conversations'
   ];
 
   async.eachSeries(tables, function(table, done) {
@@ -119,10 +124,3 @@ var unloadToS3 = module.exports.unloadToS3 = function(callback) {
     return callback();
   });
 };
-
-unloadToS3(function(err) {
-  if (err) {
-    log.error('Completed with errors');
-  }
-  log.info('All done !');
-});

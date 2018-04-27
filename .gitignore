@@ -37,7 +37,7 @@ config/*.json
 sql/*
 sql/dbCreation.sql
 sql/dbRepoint.sql
-scripts/suitec-analytics/lib/sql/*
+scripts/suitec-analytics/lib/sql/*.sql
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

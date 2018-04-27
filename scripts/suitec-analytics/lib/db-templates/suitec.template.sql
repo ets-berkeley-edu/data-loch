@@ -23,7 +23,7 @@
  * ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-DROP SCHEMA <%= suitecExternalSchema %>;
+DROP SCHEMA IF EXISTS <%= suitecExternalSchema %>;
 
 CREATE EXTERNAL SCHEMA <%= suitecExternalSchema %>
 FROM data catalog
@@ -32,7 +32,7 @@ iam_role '<%= iamRole %>'
 CREATE EXTERNAL DATABASE IF NOT EXISTS;
 
 CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.mixpanel_events (
-    event VARCHAR(20000)
+    event varchar(20000)
 )
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
@@ -275,6 +275,36 @@ ROW FORMAT DELIMITED
 FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= suitecS3Location %>/courses';
+
+--
+-- Name: events
+--
+CREATE EXTERNAL TABLE <%= suitecExternalSchema %>.events (
+    id integer,
+    uuid varchar,
+    event_name varchar(255),
+    event_metadata varchar(20000),
+    canvas_domain varchar(255),
+    user_id integer,
+    user_full_name varchar(255),
+    canvas_user_id integer,
+    canvas_course_role varchar(255),
+    course_id integer,
+    canvas_course_id integer,
+    course_name varchar(255),
+    activity_id integer,
+    asset_id integer,
+    comment_id integer,
+    whiteboard_id integer,
+    whiteboard_element_uid integer,
+    created_at timestamp,
+    updated_at timestamp
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE
+LOCATION '<%= suitecS3Location %>/events';
+
 
 --
 -- Name: pinned_user_assets
