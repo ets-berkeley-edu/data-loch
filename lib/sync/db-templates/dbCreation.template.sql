@@ -644,8 +644,7 @@ CREATE EXTERNAL TABLE <%= externalSchema %>.historical_requests_parquet(
 STORED AS PARQUET
 LOCATION '<%= s3RequestsHistoricalLocation %>/requests-parquet-snappy';
 
-
-
+-- conversation message participation fact
 CREATE EXTERNAL TABLE <%= externalSchema %>.conversation_message_participant_fact (
     conversation_message_id	BIGINT,	-- Foreign key to the message dimension for the associated message.
     conversation_id	BIGINT,	--Foreign key to the conversation dimension for the associated conversation
@@ -666,8 +665,7 @@ FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/conversation_message_participant_fact';
 
-
-
+-- conversation_dim
 CREATE EXTERNAL TABLE <%= externalSchema %>.conversation_dim (
     id	BIGINT,	-- Unique surrogate id for the conversation.
     canvas_id	BIGINT,	-- Original primary key for conversation in the Canvas table
@@ -683,8 +681,7 @@ FIELDS TERMINATED BY '\t'
 STORED AS TEXTFILE
 LOCATION '<%= s3DailyLocation %>/conversation_dim';
 
-
-
+-- conversation message dim
 CREATE EXTERNAL TABLE <%= externalSchema %>.conversation_message_dim (
     id	BIGINT,	-- Unique surrogate id for the message.
     canvas_id	BIGINT,	-- Original ID for canvas table.

@@ -50,7 +50,7 @@ fi
 # export password so that it need not be re-entered for every extracts
 export PGPASSWORD=${db_password}
 
-# clean up obsolete suitec data and recreate the folder structure to mimick S3 external table structures
+# clean up obsolete suitec data and recreate the folder structure to mimic S3 external table structures
 rm -rf ~/suitec-data
 mkdir -p ~/suitec-data
 
@@ -64,9 +64,8 @@ do
   # create s3 directory structure locally and download suitec table extracts
   mkdir -p ~/suitec-data/$i
   echo "Downloading $i from suitec database."
-  # psql -h suitec-prod.cjbten67djel.us-west-2.rds.amazonaws.com -U suitec -c "COPY (select * from $i) to STDOUT with NULL AS ''" > ~/suitec-data/$i/$i.tsv
   psql -h ${db_host} -U suitec -c "COPY (select * from $i) to STDOUT with NULL AS ''" > ~/suitec-data/$i/$i.tsv
 done
 
 # Copy the entire folder structure into the appropriate S3 location to restore
-aws s3 cp --recursive ~/suitec-data/ s3://${s3_data_loch_bucket}/suiteC/suitec-prod/public
+aws s3 cp --recursive ~/suitec-data/ s3://${s3_data_loch_bucket}/suiteC/suitec-prod/public --sse

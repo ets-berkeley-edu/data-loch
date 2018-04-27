@@ -31,7 +31,7 @@ var moment = require('moment');
 var path = require('path');
 var Redshift = require('node-redshift');
 
-var log = require('../../../lib/core/logger')('syncSuitecDb');
+var log = require('../../../lib/core/logger')('unloadTablesToS3');
 var db = require('../../../lib/sync/db.js');
 
 var prepareUnloadData = module.exports.prepareUnloadData = function(schemaName, tableName, callback) {
@@ -46,7 +46,7 @@ var prepareUnloadData = module.exports.prepareUnloadData = function(schemaName, 
       return callback(err);
     }
 
-    var date = moment().format('MM-DD-YYYY');
+    var date = moment().format('YYYY-MM-DD');
     var researchGroupRequestingData = config.get('datalake.suitec.researchGroupRequestingData');
     var exportLocation = 's3://' + config.get('datalake.s3.bucket') + '/suiteC/export/' + researchGroupRequestingData + '/' + date + '/' + tableName;
     var credentials = 'aws_access_key_id=' + config.get('aws.credentials.accessKeyId') +
@@ -84,6 +84,7 @@ var unloadToS3 = module.exports.unloadToS3 = function(callback) {
     'asset_comments',
     'asset_users',
     'courses',
+    'events',
     'ei_score_configs',
     'mixpanel_events',
     'user_enrollments',
@@ -123,10 +124,3 @@ var unloadToS3 = module.exports.unloadToS3 = function(callback) {
     return callback();
   });
 };
-
-unloadToS3(function(err) {
-  if (err) {
-    log.error('Completed with errors');
-  }
-  log.info('All done !');
-});

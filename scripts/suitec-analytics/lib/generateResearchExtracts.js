@@ -30,7 +30,7 @@ var fs = require('fs');
 var path = require('path');
 var Redshift = require('node-redshift');
 
-var log = require('../../../lib/core/logger')('syncSuitecDb');
+var log = require('../../../lib/core/logger')('generateResearchExtracts');
 var db = require('../../../lib/sync/db.js');
 
 /**
@@ -85,7 +85,7 @@ var createSqlTemplates = function(callback) {
 
   generateSqlScript(suitecTemplate, suitecDbScript, function(err) {
     if (err) {
-      log.error({err: err, template: dbCreationTemplate, script: dbCreationScript}, 'Failed to generate SQL script using db-template.');
+      log.error({err: err, template: suitecTemplate, script: suitecDbScript}, 'Failed to generate SQL script using db-template.');
 
       return callback(err);
     }
@@ -96,7 +96,7 @@ var createSqlTemplates = function(callback) {
 
     generateSqlScript(suitecProcessTemplate, suitecProcessScript, function(err) {
       if (err) {
-        log.error({err: err, template: dbRepointTemplate, script: dbRepointScript}, 'Failed to generate SQL script using db-template.');
+        log.error({err: err, template: suitecProcessTemplate, script: suitecProcessScript}, 'Failed to generate SQL script using db-template.');
 
         return callback(err);
       }
@@ -132,7 +132,7 @@ var createDatabase = function(callback) {
  * @param  {Function}         callback                Standard callback function
  * @param  {Object}           callback.err            An error object, if any
  */
-var generateAnalyticsTables = function(callback) {
+var generateAnalyticsTables = module.exports.generateAnalyticsTables = function(callback) {
   log.info('Run analytic pipelines... this might take a while.');
   db.runSQLScript(path.join(__dirname, 'sql/suitecProcess.sql'), function(err) {
     if (err) {
@@ -171,23 +171,3 @@ var loadSchema = module.exports.loadSchema = function(callback) {
     });
   });
 };
-
-/**
- *
- *
- * @param  {Function}         callback                Standard callback function
- * @param  {Object}           callback.err            An error object, if any
- */
-loadSchema(function(err) {
-  if (err) {
-    log.error('Completed with errors.');
-  }
-
-  generateAnalyticsTables(function(err) {
-    if (err) {
-      log.error('Completed with errors.');
-    }
-
-    log.info('All done.');
-  });
-});

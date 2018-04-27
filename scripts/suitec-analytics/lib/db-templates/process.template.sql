@@ -286,6 +286,8 @@ WITH q1 AS (
                 views,
                 comment_count,
                 created_at,
+                deleted_at,
+                updated_at,
                 course_id AS suitec_course_id,
                 canvas_assignment_id,
                 impact_percentile,
@@ -317,6 +319,8 @@ WITH q1 AS (
                 q2.comment_count,
                 q3.re_uses,
                 q2.created_at,
+                q2.deleted_at,
+                q2.updated_at,
                 q1.canvas_course_id,
                 q1.canvas_course_name,
                 q2.canvas_assignment_id,
@@ -528,6 +532,29 @@ AS (
         canvas_course_name
     FROM
         <%= suitecAnalyticsSchema %>.user_enrollments);
+
+-- Suite C events table (Contains events starting March 2018)
+CREATE TABLE <%= suitecAnalyticsSchema %>.events AS (
+SELECT
+    a.uuid,
+    a.event_name,
+    a.event_metadata,
+    a.canvas_domain,
+    md5(a.canvas_user_id) AS hashed_user_id,
+    a.canvas_course_role,
+    a.canvas_course_id,
+    a.course_name,
+    a.activity_id ,
+    a.asset_id,
+    a.comment_id,
+    a.whiteboard_id,
+    a.whiteboard_element_uid,
+    a.created_at,
+    a.updated_at
+FROM <%= suitecExternalSchema %>.events a
+	INNER JOIN <%= suitecAnalyticsSchema %>.courses b
+		ON a.canvas_course_id = b.canvas_course_id
+);
 
 -- Canvas Discussion Entry
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.canvas_discussions_entry;
