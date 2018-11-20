@@ -40,11 +40,15 @@ DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.assets;
 
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.asset_users;
 
+DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.asset_whiteboard_elements;
+
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.asset_categories;
 
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.asset_comments;
 
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.whiteboards;
+
+DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.whiteboard_elements;
 
 DROP TABLE IF EXISTS <%= suitecAnalyticsSchema %>.whiteboard_members;
 
@@ -417,6 +421,26 @@ WITH q1 AS (
         INNER JOIN q2 ON q3.asset_id = q2.asset_id
         INNER JOIN q1 ON q3.user_id = q1.user_id);
 
+-- asset whiteboard elements table clean up
+CREATE TABLE <%= suitecAnalyticsSchema %>.asset_whiteboard_elements
+AS (
+WITH q1 AS (
+            SELECT
+                asset_id
+            FROM
+                <%= suitecAnalyticsSchema %>.assets
+        )
+        SELECT
+            q2.uid,
+            q2.element,
+            q2.created_at,
+            q2.updated_at,
+            q2.asset_id,
+            q2.element_asset_id
+        FROM
+            <%= suitecExternalSchema %>.asset_whiteboard_elements q2
+        INNER JOIN q1 ON q1.asset_id = q2.asset_id);
+
 -- whiteboards table clean up
 CREATE TABLE <%= suitecAnalyticsSchema %>.whiteboards
 AS (
@@ -483,6 +507,26 @@ WITH q1 AS (
             <%= suitecExternalSchema %>.whiteboard_members q3
         INNER JOIN q2 ON q3.whiteboard_id = q2.whiteboard_id
         INNER JOIN q1 ON q3.user_id = q1.user_id);
+
+-- whiteboard elements table clean up
+CREATE TABLE <%= suitecAnalyticsSchema %>.whiteboard_elements
+AS (
+WITH q1 AS (
+            SELECT
+                whiteboard_id
+            FROM
+                <%= suitecAnalyticsSchema %>.whiteboards
+        )
+        SELECT
+            q2.uid,
+            q2.element,
+            q2.created_at,
+            q2.updated_at,
+            q2.whiteboard_id,
+            q2.asset_id
+        FROM
+            <%= suitecExternalSchema %>.whiteboard_elements q2
+        INNER JOIN q1 ON q1.whiteboard_id = q2.whiteboard_id);
 
 -- chats table clean up
 CREATE TABLE <%= suitecAnalyticsSchema %>.whiteboard_chats
