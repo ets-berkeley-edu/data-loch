@@ -73,7 +73,7 @@ rules:
     - 2
     - unix
   max-len:
-    - 2
+    - 1
     - 150
     - 4
     - ignoreComments: true

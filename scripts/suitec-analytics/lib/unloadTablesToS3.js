@@ -48,7 +48,7 @@ var prepareUnloadData = module.exports.prepareUnloadData = function(schemaName, 
 
     var date = moment().format('YYYY-MM-DD');
     var researchGroupRequestingData = config.get('datalake.suitec.researchGroupRequestingData');
-    var exportLocation = 's3://' + config.get('datalake.s3.bucket') + '/suiteC/export/' + researchGroupRequestingData + '/' + date + '/' + tableName;
+    var exportLocation = 's3://' + config.get('datalake.s3.bucket') + '/suitec-data/export/' + researchGroupRequestingData + '/' + date + '/' + tableName;
     var credentials = 'aws_access_key_id=' + config.get('aws.credentials.accessKeyId') +
      ';aws_secret_access_key=' + config.get('aws.credentials.secretAccessKey');
 

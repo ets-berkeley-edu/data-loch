@@ -27,7 +27,7 @@
     "gulp-eslint": "4.0.0",
     "http": "latest",
     "jsoncsv": "latest",
-    "lodash": "4.17.4",
+    "lodash": "4.17.5",
     "MD5": "latest",
     "mixpanel": "latest",
     "mixpanel-data-export": "latest",
