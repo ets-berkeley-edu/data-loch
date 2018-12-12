@@ -54,7 +54,7 @@ var generateSqlScript = function(templateFile, outputFile, callback) {
       suitecS3Location: 's3://' + config.get('datalake.s3.bucket') + '/' + config.get('datalake.suitec.directory.suitec'),
       suitecS3MixpanelLocation: 's3://' + config.get('datalake.s3.bucket') + '/' + config.get('datalake.suitec.directory.mixpanelEvents'),
       iamRole: config.get('datalake.redshift.iamRole'),
-      suitecDictionaryLocation: 's3://' + config.get('datalake.s3.bucket') + '/suiteC/dictionary',
+      suitecDictionaryLocation: 's3://' + config.get('datalake.s3.bucket') + '/suitec-data/dictionary',
       researchGroupRequestingData: config.get('datalake.suitec.researchGroupRequestingData')
     };
     var templateOutput = _.template(template)(templateData);
