@@ -68,4 +68,4 @@ do
 done
 
 # Copy the entire folder structure into the appropriate S3 location to restore
-aws s3 cp --recursive ~/suitec-data/ s3://${s3_data_loch_bucket}/suiteC/suitec-prod/public --sse
+aws s3 cp --recursive ~/suitec-data/ s3://${s3_data_loch_bucket}/suitec-data/suitec-prod/public --sse

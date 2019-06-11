@@ -23,12 +23,12 @@ based on researchers requests. Steps:
 Include the canvas course ids and research group requesting the data extract.
 ```
 mkdir -p ~/dictionary
-aws s3 cp s3://<data-loch-bucket>/suiteC/dictionary/  ~/dictionary --recursive
+aws s3 cp s3://<data-loch-bucket>/suitec-data/dictionary/  ~/dictionary --recursive
 ```
 
 2. Update the dictionary csv file and upload it to the s3 dictionary location on data-loch
 ```
-aws s3 cp ~/dictionary/ s3://<data-loch-bucket>/suiteC/dictionary/ --recursive --sse
+aws s3 cp ~/dictionary/ s3://<data-loch-bucket>/suitec-data/dictionary/ --recursive --sse
 ```
 
 3. Run the bash script syncSuitecToS3 to restore suitec data in data-loch. The script has a synopsis and
@@ -52,7 +52,7 @@ node scripts/suitec-analytics/app.js
 5. Files can be downloaded to local folder using aws s3 cp command. Verify and upload the files to Box folder of the researchers
 ```
 mkdir -p ~/data-export
-aws s3 cp s3://<data-loch-bucket>/suiteC/export/<researcher_name>/<extract-date>/ ~/data-export --recursive
+aws s3 cp s3://<data-loch-bucket>/suitec-data/export/<researcher_name>/<extract-date>/ ~/data-export --recursive
 
 # Clean up local drives of sensitive data
 rm -rf ~/suitec-data
